@@ -1,6 +1,7 @@
 -- VortexHub UI Library
 -- Created by Late
--- Version: 1.0
+-- Version: 2.0
+-- Clean & Modern Design
 
 local VortexHub = {}
 
@@ -11,19 +12,29 @@ function VortexHub:CreateWindow(windowName)
     local UserInputService = game:GetService("UserInputService")
     local TweenService = game:GetService("TweenService")
     
+    -- Colors
+    local Colors = {
+        Background = Color3.fromRGB(10, 10, 10),
+        Header = Color3.fromRGB(20, 20, 20),
+        Tab = Color3.fromRGB(15, 15, 15),
+        Content = Color3.fromRGB(12, 12, 12),
+        Element = Color3.fromRGB(25, 25, 25),
+        Primary = Color3.fromRGB(0, 100, 255),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(180, 180, 180)
+    }
+    
     -- Main UI Instances
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local MainCorner = Instance.new("UICorner")
+    local MainStroke = Instance.new("UIStroke")
     local Header = Instance.new("Frame")
-    local HeaderCorner = Instance.new("UICorner")
     local Title = Instance.new("TextLabel")
-    local CloseButton = Instance.new("ImageButton")
+    local CloseButton = Instance.new("TextButton")
     local TabContainer = Instance.new("Frame")
     local TabList = Instance.new("UIListLayout")
-    local TabPadding = Instance.new("UIPadding")
     local ContentContainer = Instance.new("Frame")
-    local ContentCorner = Instance.new("UICorner")
     local PagesFolder = Instance.new("Folder")
     
     -- ScreenGui Setup
@@ -31,79 +42,70 @@ function VortexHub:CreateWindow(windowName)
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     
-    -- Main Frame (Daha küçük boyut)
+    -- Main Frame (Compact Design)
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    MainFrame.BackgroundColor3 = Colors.Background
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
-    MainFrame.Size = UDim2.new(0, 400, 0, 280) -- Daha küçük
+    MainFrame.Size = UDim2.new(0, 350, 0, 250)
     
-    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.CornerRadius = UDim.new(0, 6)
     MainCorner.Name = "MainCorner"
     MainCorner.Parent = MainFrame
     
-    -- Header
+    MainStroke.Color = Color3.fromRGB(40, 40, 40)
+    MainStroke.Thickness = 1
+    MainStroke.Parent = MainFrame
+    
+    -- Header (Simplified)
     Header.Name = "Header"
     Header.Parent = MainFrame
-    Header.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Header.Size = UDim2.new(1, 0, 0, 35)
+    Header.BackgroundColor3 = Colors.Header
+    Header.Size = UDim2.new(1, 0, 0, 30)
     
-    HeaderCorner.CornerRadius = UDim.new(0, 8)
-    HeaderCorner.Name = "HeaderCorner"
-    HeaderCorner.Parent = Header
-    
-    -- Title
     Title.Name = "Title"
     Title.Parent = Header
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 15, 0, 0)
+    Title.Position = UDim2.new(0, 10, 0, 0)
     Title.Size = UDim2.new(0, 200, 1, 0)
     Title.Font = Enum.Font.GothamBold
     Title.Text = windowName
-    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextSize = 14
+    Title.TextColor3 = Colors.Text
+    Title.TextSize = 13
     Title.TextXAlignment = Enum.TextXAlignment.Left
     
-    -- Close Button
     CloseButton.Name = "CloseButton"
     CloseButton.Parent = Header
-    CloseButton.BackgroundTransparency = 1
-    CloseButton.Position = UDim2.new(1, -30, 0.5, -10)
-    CloseButton.Size = UDim2.new(0, 20, 0, 20)
-    CloseButton.Image = "rbxassetid://3926305904" -- X icon
-    CloseButton.ImageRectOffset = Vector2.new(924, 724)
-    CloseButton.ImageRectSize = Vector2.new(36, 36)
-    CloseButton.ImageColor3 = Color3.fromRGB(255, 80, 80)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    CloseButton.Position = UDim2.new(1, -25, 0.5, -8)
+    CloseButton.Size = UDim2.new(0, 16, 0, 16)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.Text = "×"
+    CloseButton.TextColor3 = Colors.Text
+    CloseButton.TextSize = 14
+    CloseButton.AutoButtonColor = false
     
-    -- Tab Container
+    -- Tab Container (Clean)
     TabContainer.Name = "TabContainer"
     TabContainer.Parent = MainFrame
-    TabContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    TabContainer.Position = UDim2.new(0, 0, 0, 35)
-    TabContainer.Size = UDim2.new(0, 100, 0, 245)
+    TabContainer.BackgroundColor3 = Colors.Tab
+    TabContainer.Position = UDim2.new(0, 0, 0, 30)
+    TabContainer.Size = UDim2.new(0, 80, 0, 220)
     
     TabList.Name = "TabList"
     TabList.Parent = TabContainer
     TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
     TabList.SortOrder = Enum.SortOrder.LayoutOrder
-    TabList.Padding = UDim.new(0, 5)
-    
-    TabPadding.Name = "TabPadding"
-    TabPadding.Parent = TabContainer
-    TabPadding.PaddingTop = UDim.new(0, 10)
+    TabList.Padding = UDim.new(0, 3)
     
     -- Content Container
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Parent = MainFrame
-    ContentContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    ContentContainer.Position = UDim2.new(0, 105, 0, 35)
-    ContentContainer.Size = UDim2.new(0, 290, 0, 245)
-    
-    ContentCorner.CornerRadius = UDim.new(0, 6)
-    ContentCorner.Name = "ContentCorner"
-    ContentCorner.Parent = ContentContainer
+    ContentContainer.BackgroundColor3 = Colors.Content
+    ContentContainer.Position = UDim2.new(0, 85, 0, 30)
+    ContentContainer.Size = UDim2.new(0, 260, 0, 220)
     
     -- Pages Folder
     PagesFolder.Name = "PagesFolder"
@@ -114,12 +116,23 @@ function VortexHub:CreateWindow(windowName)
     CloseButton.MouseButton1Click:Connect(function()
         isMinimized = not isMinimized
         if isMinimized then
-            MainFrame:TweenSize(UDim2.new(0, 400, 0, 35), "Out", "Quad", 0.2)
-            CloseButton.Rotation = 45
+            MainFrame:TweenSize(UDim2.new(0, 350, 0, 30), "Out", "Quad", 0.2)
         else
-            MainFrame:TweenSize(UDim2.new(0, 400, 0, 280), "Out", "Quad", 0.2)
-            CloseButton.Rotation = 0
+            MainFrame:TweenSize(UDim2.new(0, 350, 0, 250), "Out", "Quad", 0.2)
         end
+    end)
+    
+    -- Hover effects for close button
+    CloseButton.MouseEnter:Connect(function()
+        TweenService:Create(CloseButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+        }):Play()
+    end)
+    
+    CloseButton.MouseLeave:Connect(function()
+        TweenService:Create(CloseButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+        }):Play()
     end)
     
     -- Drag Functionality
@@ -166,20 +179,16 @@ function VortexHub:CreateWindow(windowName)
         
         -- Tab Button
         local TabButton = Instance.new("TextButton")
-        local TabCorner = Instance.new("UICorner")
         
         TabButton.Name = "TabButton_" .. tabName
         TabButton.Parent = TabContainer
-        TabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        TabButton.Size = UDim2.new(0, 90, 0, 30)
+        TabButton.BackgroundColor3 = Colors.Element
+        TabButton.Size = UDim2.new(0, 70, 0, 25)
         TabButton.Font = Enum.Font.Gotham
         TabButton.Text = tabName
-        TabButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-        TabButton.TextSize = 12
+        TabButton.TextColor3 = Colors.SubText
+        TabButton.TextSize = 11
         TabButton.AutoButtonColor = false
-        
-        TabCorner.CornerRadius = UDim.new(0, 4)
-        TabCorner.Parent = TabButton
         
         -- Tab Content
         local TabContent = Instance.new("ScrollingFrame")
@@ -190,19 +199,19 @@ function VortexHub:CreateWindow(windowName)
         TabContent.Parent = PagesFolder
         TabContent.BackgroundTransparency = 1
         TabContent.Size = UDim2.new(1, 0, 1, 0)
-        TabContent.ScrollBarThickness = 3
-        TabContent.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 255)
+        TabContent.ScrollBarThickness = 2
+        TabContent.ScrollBarImageColor3 = Colors.Primary
         TabContent.Visible = false
         
         ContentList.Name = "ContentList"
         ContentList.Parent = TabContent
         ContentList.SortOrder = Enum.SortOrder.LayoutOrder
-        ContentList.Padding = UDim.new(0, 8)
+        ContentList.Padding = UDim.new(0, 5)
         
         ContentPadding.Name = "ContentPadding"
         ContentPadding.Parent = TabContent
-        ContentPadding.PaddingLeft = UDim.new(0, 10)
-        ContentPadding.PaddingTop = UDim.new(0, 10)
+        ContentPadding.PaddingLeft = UDim.new(0, 8)
+        ContentPadding.PaddingTop = UDim.new(0, 8)
         
         -- Auto resize content
         local function UpdateContentSize()
@@ -224,8 +233,8 @@ function VortexHub:CreateWindow(windowName)
             for _, tab in pairs(TabContainer:GetChildren()) do
                 if tab:IsA("TextButton") then
                     TweenService:Create(tab, TweenInfo.new(0.2), {
-                        BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-                        TextColor3 = Color3.fromRGB(200, 200, 200)
+                        BackgroundColor3 = Colors.Element,
+                        TextColor3 = Colors.SubText
                     }):Play()
                 end
             end
@@ -233,8 +242,8 @@ function VortexHub:CreateWindow(windowName)
             -- Show selected page and highlight tab
             TabContent.Visible = true
             TweenService:Create(TabButton, TweenInfo.new(0.2), {
-                BackgroundColor3 = Color3.fromRGB(80, 80, 255),
-                TextColor3 = Color3.fromRGB(255, 255, 255)
+                BackgroundColor3 = Colors.Primary,
+                TextColor3 = Colors.Text
             }):Play()
             
             UpdateContentSize()
@@ -246,43 +255,28 @@ function VortexHub:CreateWindow(windowName)
         function ElementHandler:Button(buttonText, callback)
             callback = callback or function() end
             
-            local ButtonFrame = Instance.new("Frame")
-            local ButtonCorner = Instance.new("UICorner")
             local Button = Instance.new("TextButton")
-            local ButtonStroke = Instance.new("UIStroke")
-            
-            ButtonFrame.Name = "ButtonFrame"
-            ButtonFrame.Parent = TabContent
-            ButtonFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            ButtonFrame.Size = UDim2.new(0, 260, 0, 35)
-            
-            ButtonCorner.CornerRadius = UDim.new(0, 6)
-            ButtonCorner.Parent = ButtonFrame
             
             Button.Name = "Button"
-            Button.Parent = ButtonFrame
-            Button.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
-            Button.Size = UDim2.new(1, 0, 1, 0)
+            Button.Parent = TabContent
+            Button.BackgroundColor3 = Colors.Primary
+            Button.Size = UDim2.new(1, -16, 0, 30)
             Button.Font = Enum.Font.Gotham
             Button.Text = buttonText
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextColor3 = Colors.Text
             Button.TextSize = 12
             Button.AutoButtonColor = false
-            
-            ButtonStroke.Color = Color3.fromRGB(60, 60, 60)
-            ButtonStroke.Thickness = 1
-            ButtonStroke.Parent = ButtonFrame
             
             -- Hover effects
             Button.MouseEnter:Connect(function()
                 TweenService:Create(Button, TweenInfo.new(0.2), {
-                    BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+                    BackgroundColor3 = Color3.fromRGB(30, 120, 255)
                 }):Play()
             end)
             
             Button.MouseLeave:Connect(function()
                 TweenService:Create(Button, TweenInfo.new(0.2), {
-                    BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+                    BackgroundColor3 = Colors.Primary
                 }):Play()
             end)
             
@@ -298,64 +292,56 @@ function VortexHub:CreateWindow(windowName)
             callback = callback or function() end
             
             local ToggleFrame = Instance.new("Frame")
-            local ToggleCorner = Instance.new("UICorner")
             local ToggleLabel = Instance.new("TextLabel")
             local ToggleButton = Instance.new("TextButton")
             local ToggleCircle = Instance.new("Frame")
-            local ToggleCircleCorner = Instance.new("UICorner")
             
             ToggleFrame.Name = "ToggleFrame"
             ToggleFrame.Parent = TabContent
-            ToggleFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            ToggleFrame.Size = UDim2.new(0, 260, 0, 30)
-            
-            ToggleCorner.CornerRadius = UDim.new(0, 6)
-            ToggleCorner.Parent = ToggleFrame
+            ToggleFrame.BackgroundColor3 = Colors.Element
+            ToggleFrame.Size = UDim2.new(1, -16, 0, 25)
             
             ToggleLabel.Name = "ToggleLabel"
             ToggleLabel.Parent = ToggleFrame
             ToggleLabel.BackgroundTransparency = 1
-            ToggleLabel.Position = UDim2.new(0, 10, 0, 0)
-            ToggleLabel.Size = UDim2.new(0, 180, 1, 0)
+            ToggleLabel.Position = UDim2.new(0, 8, 0, 0)
+            ToggleLabel.Size = UDim2.new(0, 150, 1, 0)
             ToggleLabel.Font = Enum.Font.Gotham
             ToggleLabel.Text = toggleText
-            ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            ToggleLabel.TextSize = 12
+            ToggleLabel.TextColor3 = Colors.Text
+            ToggleLabel.TextSize = 11
             ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
             
             ToggleButton.Name = "ToggleButton"
             ToggleButton.Parent = ToggleFrame
             ToggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            ToggleButton.Position = UDim2.new(1, -45, 0.5, -10)
-            ToggleButton.Size = UDim2.new(0, 40, 0, 20)
+            ToggleButton.Position = UDim2.new(1, -35, 0.5, -8)
+            ToggleButton.Size = UDim2.new(0, 30, 0, 16)
             ToggleButton.AutoButtonColor = false
             ToggleButton.Text = ""
             
             ToggleCircle.Name = "ToggleCircle"
             ToggleCircle.Parent = ToggleButton
-            ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            ToggleCircle.Position = UDim2.new(0, 2, 0.5, -8)
-            ToggleCircle.Size = UDim2.new(0, 16, 0, 16)
-            
-            ToggleCircleCorner.CornerRadius = UDim.new(1, 0)
-            ToggleCircleCorner.Parent = ToggleCircle
+            ToggleCircle.BackgroundColor3 = Colors.Text
+            ToggleCircle.Position = UDim2.new(0, 2, 0.5, -6)
+            ToggleCircle.Size = UDim2.new(0, 12, 0, 12)
             
             local isToggled = defaultValue
             
             local function updateToggle()
                 if isToggled then
                     TweenService:Create(ToggleButton, TweenInfo.new(0.2), {
-                        BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+                        BackgroundColor3 = Colors.Primary
                     }):Play()
                     TweenService:Create(ToggleCircle, TweenInfo.new(0.2), {
-                        Position = UDim2.new(1, -18, 0.5, -8)
+                        Position = UDim2.new(1, -14, 0.5, -6)
                     }):Play()
                 else
                     TweenService:Create(ToggleButton, TweenInfo.new(0.2), {
                         BackgroundColor3 = Color3.fromRGB(60, 60, 60)
                     }):Play()
                     TweenService:Create(ToggleCircle, TweenInfo.new(0.2), {
-                        Position = UDim2.new(0, 2, 0.5, -8)
+                        Position = UDim2.new(0, 2, 0.5, -6)
                     }):Play()
                 end
                 callback(isToggled)
@@ -371,26 +357,17 @@ function VortexHub:CreateWindow(windowName)
         end
         
         function ElementHandler:Label(labelText)
-            local LabelFrame = Instance.new("Frame")
-            local LabelCorner = Instance.new("UICorner")
             local Label = Instance.new("TextLabel")
             
-            LabelFrame.Name = "LabelFrame"
-            LabelFrame.Parent = TabContent
-            LabelFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            LabelFrame.Size = UDim2.new(0, 260, 0, 25)
-            
-            LabelCorner.CornerRadius = UDim.new(0, 6)
-            LabelCorner.Parent = LabelFrame
-            
             Label.Name = "Label"
-            Label.Parent = LabelFrame
+            Label.Parent = TabContent
             Label.BackgroundTransparency = 1
-            Label.Size = UDim2.new(1, 0, 1, 0)
+            Label.Size = UDim2.new(1, -16, 0, 20)
             Label.Font = Enum.Font.Gotham
             Label.Text = labelText
-            Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Label.TextSize = 12
+            Label.TextColor3 = Colors.SubText
+            Label.TextSize = 11
+            Label.TextXAlignment = Enum.TextXAlignment.Left
             
             UpdateContentSize()
         end
@@ -402,60 +379,48 @@ function VortexHub:CreateWindow(windowName)
             callback = callback or function() end
             
             local SliderFrame = Instance.new("Frame")
-            local SliderCorner = Instance.new("UICorner")
             local SliderLabel = Instance.new("TextLabel")
             local SliderValue = Instance.new("TextLabel")
             local SliderTrack = Instance.new("Frame")
-            local SliderTrackCorner = Instance.new("UICorner")
             local SliderFill = Instance.new("Frame")
-            local SliderFillCorner = Instance.new("UICorner")
             local SliderButton = Instance.new("TextButton")
             
             SliderFrame.Name = "SliderFrame"
             SliderFrame.Parent = TabContent
-            SliderFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            SliderFrame.Size = UDim2.new(0, 260, 0, 50)
-            
-            SliderCorner.CornerRadius = UDim.new(0, 6)
-            SliderCorner.Parent = SliderFrame
+            SliderFrame.BackgroundColor3 = Colors.Element
+            SliderFrame.Size = UDim2.new(1, -16, 0, 40)
             
             SliderLabel.Name = "SliderLabel"
             SliderLabel.Parent = SliderFrame
             SliderLabel.BackgroundTransparency = 1
-            SliderLabel.Position = UDim2.new(0, 10, 0, 5)
-            SliderLabel.Size = UDim2.new(0, 180, 0, 15)
+            SliderLabel.Position = UDim2.new(0, 8, 0, 5)
+            SliderLabel.Size = UDim2.new(0, 150, 0, 15)
             SliderLabel.Font = Enum.Font.Gotham
             SliderLabel.Text = sliderText
-            SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            SliderLabel.TextSize = 12
+            SliderLabel.TextColor3 = Colors.Text
+            SliderLabel.TextSize = 11
             SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
             
             SliderValue.Name = "SliderValue"
             SliderValue.Parent = SliderFrame
             SliderValue.BackgroundTransparency = 1
-            SliderValue.Position = UDim2.new(1, -50, 0, 5)
-            SliderValue.Size = UDim2.new(0, 40, 0, 15)
+            SliderValue.Position = UDim2.new(1, -40, 0, 5)
+            SliderValue.Size = UDim2.new(0, 32, 0, 15)
             SliderValue.Font = Enum.Font.Gotham
             SliderValue.Text = tostring(defaultValue)
-            SliderValue.TextColor3 = Color3.fromRGB(200, 200, 200)
-            SliderValue.TextSize = 12
+            SliderValue.TextColor3 = Colors.SubText
+            SliderValue.TextSize = 11
             
             SliderTrack.Name = "SliderTrack"
             SliderTrack.Parent = SliderFrame
-            SliderTrack.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            SliderTrack.Position = UDim2.new(0, 10, 1, -25)
-            SliderTrack.Size = UDim2.new(1, -20, 0, 10)
-            
-            SliderTrackCorner.CornerRadius = UDim.new(1, 0)
-            SliderTrackCorner.Parent = SliderTrack
+            SliderTrack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            SliderTrack.Position = UDim2.new(0, 8, 1, -20)
+            SliderTrack.Size = UDim2.new(1, -16, 0, 6)
             
             SliderFill.Name = "SliderFill"
             SliderFill.Parent = SliderTrack
-            SliderFill.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+            SliderFill.BackgroundColor3 = Colors.Primary
             SliderFill.Size = UDim2.new((defaultValue - minVal) / (maxVal - minVal), 0, 1, 0)
-            
-            SliderFillCorner.CornerRadius = UDim.new(1, 0)
-            SliderFillCorner.Parent = SliderFill
             
             SliderButton.Name = "SliderButton"
             SliderButton.Parent = SliderTrack
@@ -505,6 +470,7 @@ function VortexHub:CreateWindow(windowName)
         
         -- Auto-select first tab
         if #TabContainer:GetChildren() == 2 then -- First tab + UIListLayout
+            wait()
             TabButton.MouseButton1Click:Connect(function() end)()
         end
         
