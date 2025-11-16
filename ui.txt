@@ -1,29 +1,23 @@
--- VortexHub UI Library
--- Ultimate Edition
--- Created with passion 🔥
+-- VortexHub UI Library - FIXED VERSION
+-- Tam Çalışan Sürüm 🔧
 
 local VortexHub = {
     Version = "3.0",
     Themes = {},
-    Windows = {},
-    Components = {}
+    Windows = {}
 }
 
 -- Core Services
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
-local RS = game:GetService("RunService")
 
 -- Utility Functions
 local function Create(className, props)
     local inst = Instance.new(className)
     for prop, value in pairs(props) do
-        if prop == "Parent" then
-            continue
-        end
-        local success = pcall(function()
+        if pcall(function() return inst[prop] end) then
             inst[prop] = value
-        end)
+        end
     end
     if props.Parent then
         inst.Parent = props.Parent
@@ -48,23 +42,7 @@ VortexHub.Themes.Dark = {
     Card = Color3.fromRGB(28, 28, 28),
     Text = Color3.fromRGB(255, 255, 255),
     SubText = Color3.fromRGB(160, 160, 160),
-    Accent = Color3.fromRGB(255, 50, 100),
-    Success = Color3.fromRGB(0, 200, 83),
-    Warning = Color3.fromRGB(255, 193, 7),
-    Error = Color3.fromRGB(255, 60, 60),
     Border = Color3.fromRGB(50, 50, 50)
-}
-
-VortexHub.Themes.Midnight = {
-    Primary = Color3.fromRGB(147, 112, 219),
-    Secondary = Color3.fromRGB(30, 30, 45),
-    Background = Color3.fromRGB(10, 10, 20),
-    Surface = Color3.fromRGB(18, 18, 28),
-    Card = Color3.fromRGB(25, 25, 35),
-    Text = Color3.fromRGB(240, 240, 255),
-    SubText = Color3.fromRGB(170, 170, 190),
-    Accent = Color3.fromRGB(255, 105, 180),
-    Border = Color3.fromRGB(60, 60, 80)
 }
 
 -- Core Window Class
@@ -73,10 +51,7 @@ function VortexHub:CreateWindow(config)
     local window = {
         Name = config.Name or "VortexHub",
         Size = config.Size or UDim2.new(0, 500, 0, 400),
-        Position = config.Position or UDim2.new(0.5, -250, 0.5, -200),
         Theme = config.Theme or self.Themes.Dark,
-        MinSize = config.MinSize or Vector2.new(300, 200),
-        Acrylic = config.Acrylic or false,
         Tabs = {}
     }
     
@@ -92,7 +67,7 @@ function VortexHub:CreateWindow(config)
         Name = "MainFrame",
         Parent = gui,
         BackgroundColor3 = window.Theme.Background,
-        Position = window.Position,
+        Position = UDim2.new(0.3, 0, 0.3, 0),
         Size = window.Size,
         ClipsDescendants = true,
         BorderSizePixel = 0
@@ -103,12 +78,6 @@ function VortexHub:CreateWindow(config)
         Parent = mainFrame
     })
     
-    Create("UIStroke", {
-        Parent = mainFrame,
-        Color = window.Theme.Border,
-        Thickness = 1
-    })
-    
     -- Header
     local header = Create("Frame", {
         Name = "Header",
@@ -116,11 +85,6 @@ function VortexHub:CreateWindow(config)
         BackgroundColor3 = window.Theme.Surface,
         Size = UDim2.new(1, 0, 0, 40),
         BorderSizePixel = 0
-    })
-    
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 12),
-        Parent = header
     })
     
     local title = Create("TextLabel", {
@@ -134,25 +98,6 @@ function VortexHub:CreateWindow(config)
         TextColor3 = window.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left
-    })
-    
-    -- Close Button
-    local closeBtn = Create("TextButton", {
-        Name = "Close",
-        Parent = header,
-        BackgroundColor3 = window.Theme.Error,
-        Position = UDim2.new(1, -30, 0.5, -8),
-        Size = UDim2.new(0, 16, 0, 16),
-        Font = Enum.Font.GothamBold,
-        Text = "×",
-        TextColor3 = window.Theme.Text,
-        TextSize = 14,
-        AutoButtonColor = false
-    })
-    
-    Create("UICorner", {
-        CornerRadius = UDim.new(1, 0),
-        Parent = closeBtn
     })
     
     -- Tab Container
@@ -173,7 +118,8 @@ function VortexHub:CreateWindow(config)
     
     Create("UIPadding", {
         Parent = tabContainer,
-        PaddingTop = UDim.new(0, 10)
+        PaddingTop = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 5)
     })
     
     -- Content Area
@@ -187,34 +133,10 @@ function VortexHub:CreateWindow(config)
         BorderSizePixel = 0
     })
     
-    Create("UICorner", {
-        CornerRadius = UDim.new(0, 8),
-        Parent = contentFrame
-    })
-    
     local pagesFolder = Create("Folder", {
         Name = "Pages",
         Parent = contentFrame
     })
-    
-    -- Close Button Functionality
-    local minimized = false
-    closeBtn.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
-            Tween(mainFrame, {Size = UDim2.new(0, 500, 0, 40)})
-        else
-            Tween(mainFrame, {Size = window.Size})
-        end
-    end)
-    
-    closeBtn.MouseEnter:Connect(function()
-        Tween(closeBtn, {BackgroundColor3 = Color3.fromRGB(255, 80, 80)})
-    end)
-    
-    closeBtn.MouseLeave:Connect(function()
-        Tween(closeBtn, {BackgroundColor3 = window.Theme.Error})
-    end)
     
     -- Drag Functionality
     local dragging, dragInput, dragStart, startPos
@@ -223,11 +145,6 @@ function VortexHub:CreateWindow(config)
             dragging = true
             dragStart = input.Position
             startPos = mainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
         end
     end)
     
@@ -244,6 +161,12 @@ function VortexHub:CreateWindow(config)
                 startPos.X.Scale, startPos.X.Offset + delta.X,
                 startPos.Y.Scale, startPos.Y.Offset + delta.Y
             )
+        end
+    end)
+    
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
         end
     end)
     
@@ -280,7 +203,8 @@ function VortexHub:CreateWindow(config)
             Size = UDim2.new(1, 0, 1, 0),
             ScrollBarThickness = 3,
             ScrollBarImageColor3 = window.Theme.Primary,
-            Visible = false
+            Visible = false,
+            CanvasSize = UDim2.new(0, 0, 0, 0)
         })
         
         local contentList = Create("UIListLayout", {
@@ -292,26 +216,32 @@ function VortexHub:CreateWindow(config)
         Create("UIPadding", {
             Parent = tabContent,
             PaddingLeft = UDim.new(0, 10),
-            PaddingTop = UDim.new(0, 10)
+            PaddingTop = UDim.new(0, 10),
+            PaddingRight = UDim.new(0, 10)
         })
         
         -- Auto Resize
         contentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 10)
+            tabContent.CanvasSize = UDim2.new(0, 0, 0, contentList.AbsoluteContentSize.Y + 20)
         end)
         
         -- Tab Click Event
         tabBtn.MouseButton1Click:Connect(function()
+            -- Hide all pages
             for _, page in pairs(pagesFolder:GetChildren()) do
-                page.Visible = false
+                if page:IsA("ScrollingFrame") then
+                    page.Visible = false
+                end
             end
             
+            -- Reset all tab colors
             for _, btn in pairs(tabContainer:GetChildren()) do
                 if btn:IsA("TextButton") then
                     Tween(btn, {BackgroundColor3 = window.Theme.Card, TextColor3 = window.Theme.SubText})
                 end
             end
             
+            -- Show selected page and highlight tab
             tabContent.Visible = true
             Tween(tabBtn, {BackgroundColor3 = window.Theme.Primary, TextColor3 = window.Theme.Text})
         end)
@@ -319,15 +249,16 @@ function VortexHub:CreateWindow(config)
         -- Element Methods
         function tab:Button(config)
             local btn = Create("TextButton", {
-                Name = "Button_" .. config.Text,
+                Name = "Button",
                 Parent = tabContent,
                 BackgroundColor3 = window.Theme.Primary,
-                Size = UDim2.new(1, -20, 0, 40),
+                Size = UDim2.new(1, 0, 0, 40),
                 Font = Enum.Font.Gotham,
                 Text = config.Text,
                 TextColor3 = window.Theme.Text,
                 TextSize = 13,
-                AutoButtonColor = false
+                AutoButtonColor = false,
+                BorderSizePixel = 0
             })
             
             Create("UICorner", {
@@ -335,18 +266,12 @@ function VortexHub:CreateWindow(config)
                 Parent = btn
             })
             
-            Create("UIStroke", {
-                Parent = btn,
-                Color = window.Theme.Border,
-                Thickness = 1
-            })
-            
             -- Hover Effects
             btn.MouseEnter:Connect(function()
                 Tween(btn, {BackgroundColor3 = Color3.fromRGB(
-                    math.min(255, window.Theme.Primary.R * 255 + 20),
-                    math.min(255, window.Theme.Primary.G * 255 + 20),
-                    math.min(255, window.Theme.Primary.B * 255 + 20)
+                    math.min(255, window.Theme.Primary.R * 255 + 30),
+                    math.min(255, window.Theme.Primary.G * 255 + 30),
+                    math.min(255, window.Theme.Primary.B * 255 + 30)
                 )})
             end)
             
@@ -361,10 +286,10 @@ function VortexHub:CreateWindow(config)
         
         function tab:Toggle(config)
             local toggleFrame = Create("Frame", {
-                Name = "Toggle_" .. config.Text,
+                Name = "Toggle",
                 Parent = tabContent,
                 BackgroundColor3 = window.Theme.Card,
-                Size = UDim2.new(1, -20, 0, 35),
+                Size = UDim2.new(1, 0, 0, 35),
                 BorderSizePixel = 0
             })
             
@@ -393,7 +318,8 @@ function VortexHub:CreateWindow(config)
                 Position = UDim2.new(1, -42, 0.5, -10),
                 Size = UDim2.new(0, 32, 0, 20),
                 Text = "",
-                AutoButtonColor = false
+                AutoButtonColor = false,
+                BorderSizePixel = 0
             })
             
             Create("UICorner", {
@@ -406,7 +332,8 @@ function VortexHub:CreateWindow(config)
                 Parent = toggleBtn,
                 BackgroundColor3 = window.Theme.Text,
                 Position = UDim2.new(0, 2, 0.5, -8),
-                Size = UDim2.new(0, 16, 0, 16)
+                Size = UDim2.new(0, 16, 0, 16),
+                BorderSizePixel = 0
             })
             
             Create("UICorner", {
@@ -424,7 +351,9 @@ function VortexHub:CreateWindow(config)
                     Tween(toggleBtn, {BackgroundColor3 = window.Theme.Secondary})
                     Tween(toggleCircle, {Position = UDim2.new(0, 2, 0.5, -8)})
                 end
-                config.Callback(state)
+                if config.Callback then
+                    config.Callback(state)
+                end
             end
             
             toggleBtn.MouseButton1Click:Connect(function()
@@ -434,23 +363,24 @@ function VortexHub:CreateWindow(config)
             
             updateToggle()
             
-            return {
-                SetValue = function(self, value)
-                    state = value
-                    updateToggle()
-                end,
-                GetValue = function(self)
-                    return state
-                end
-            }
+            local toggleObject = {}
+            function toggleObject:SetValue(value)
+                state = value
+                updateToggle()
+            end
+            function toggleObject:GetValue()
+                return state
+            end
+            
+            return toggleObject
         end
         
         function tab:Slider(config)
             local sliderFrame = Create("Frame", {
-                Name = "Slider_" .. config.Text,
+                Name = "Slider",
                 Parent = tabContent,
                 BackgroundColor3 = window.Theme.Card,
-                Size = UDim2.new(1, -20, 0, 60),
+                Size = UDim2.new(1, 0, 0, 60),
                 BorderSizePixel = 0
             })
             
@@ -481,7 +411,8 @@ function VortexHub:CreateWindow(config)
                 Font = Enum.Font.Gotham,
                 Text = tostring(config.Default or config.Min or 0),
                 TextColor3 = window.Theme.SubText,
-                TextSize = 11
+                TextSize = 11,
+                TextXAlignment = Enum.TextXAlignment.Right
             })
             
             local track = Create("Frame", {
@@ -489,7 +420,8 @@ function VortexHub:CreateWindow(config)
                 Parent = sliderFrame,
                 BackgroundColor3 = window.Theme.Secondary,
                 Position = UDim2.new(0, 12, 0, 35),
-                Size = UDim2.new(1, -24, 0, 6)
+                Size = UDim2.new(1, -24, 0, 6),
+                BorderSizePixel = 0
             })
             
             Create("UICorner", {
@@ -501,7 +433,8 @@ function VortexHub:CreateWindow(config)
                 Name = "Fill",
                 Parent = track,
                 BackgroundColor3 = window.Theme.Primary,
-                Size = UDim2.new((config.Default or 0) / (config.Max or 100), 0, 1, 0)
+                Size = UDim2.new((config.Default or 0) / (config.Max or 100), 0, 1, 0),
+                BorderSizePixel = 0
             })
             
             Create("UICorner", {
@@ -527,7 +460,9 @@ function VortexHub:CreateWindow(config)
                 local scale = (value - min) / (max - min)
                 Tween(fill, {Size = UDim2.new(scale, 0, 1, 0)})
                 valueLabel.Text = tostring(math.floor(value))
-                config.Callback(value)
+                if config.Callback then
+                    config.Callback(value)
+                end
             end
             
             local sliding = false
@@ -554,22 +489,23 @@ function VortexHub:CreateWindow(config)
             
             updateSlider(value)
             
-            return {
-                SetValue = function(self, newValue)
-                    updateSlider(newValue)
-                end,
-                GetValue = function(self)
-                    return value
-                end
-            }
+            local sliderObject = {}
+            function sliderObject:SetValue(newValue)
+                updateSlider(newValue)
+            end
+            function sliderObject:GetValue()
+                return value
+            end
+            
+            return sliderObject
         end
         
         function tab:Label(config)
             local label = Create("TextLabel", {
-                Name = "Label_" .. config.Text,
+                Name = "Label",
                 Parent = tabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -20, 0, 25),
+                Size = UDim2.new(1, 0, 0, 25),
                 Font = Enum.Font.Gotham,
                 Text = config.Text,
                 TextColor3 = config.Color or window.Theme.SubText,
@@ -577,128 +513,17 @@ function VortexHub:CreateWindow(config)
                 TextXAlignment = Enum.TextXAlignment.Left
             })
             
-            return label
-        end
-        
-        function tab:Dropdown(config)
-            local dropdownFrame = Create("Frame", {
-                Name = "Dropdown_" .. config.Text,
-                Parent = tabContent,
-                BackgroundColor3 = window.Theme.Card,
-                Size = UDim2.new(1, -20, 0, 35),
-                ClipsDescendants = true,
-                BorderSizePixel = 0
-            })
-            
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = dropdownFrame
-            })
-            
-            local label = Create("TextLabel", {
-                Name = "Label",
-                Parent = dropdownFrame,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0, 0),
-                Size = UDim2.new(0, 200, 1, 0),
-                Font = Enum.Font.Gotham,
-                Text = config.Text,
-                TextColor3 = window.Theme.Text,
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
-            
-            local arrow = Create("ImageLabel", {
-                Name = "Arrow",
-                Parent = dropdownFrame,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(1, -25, 0.5, -6),
-                Size = UDim2.new(0, 12, 0, 12),
-                Image = "rbxassetid://6031091004",
-                ImageColor3 = window.Theme.SubText
-            })
-            
-            local dropdownBtn = Create("TextButton", {
-                Name = "DropdownBtn",
-                Parent = dropdownFrame,
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 1, 0),
-                Text = ""
-            })
-            
-            local optionsFrame = Create("Frame", {
-                Name = "Options",
-                Parent = dropdownFrame,
-                BackgroundColor3 = window.Theme.Surface,
-                Position = UDim2.new(0, 0, 1, 5),
-                Size = UDim2.new(1, 0, 0, 0),
-                ClipsDescendants = true,
-                BorderSizePixel = 0
-            })
-            
-            Create("UICorner", {
-                CornerRadius = UDim.new(0, 6),
-                Parent = optionsFrame
-            })
-            
-            local optionsList = Create("UIListLayout", {
-                Parent = optionsFrame,
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-            
-            local opened = false
-            
-            local function toggleDropdown()
-                opened = not opened
-                if opened then
-                    Tween(optionsFrame, {Size = UDim2.new(1, 0, 0, #config.Options * 30)})
-                    Tween(arrow, {Rotation = 180})
-                else
-                    Tween(optionsFrame, {Size = UDim2.new(1, 0, 0, 0)})
-                    Tween(arrow, {Rotation = 0})
-                end
+            local labelObject = {}
+            function labelObject:SetLabel(newText)
+                label.Text = newText
             end
             
-            dropdownBtn.MouseButton1Click:Connect(toggleDropdown)
-            
-            for i, option in pairs(config.Options) do
-                local optionBtn = Create("TextButton", {
-                    Name = "Option_" .. option,
-                    Parent = optionsFrame,
-                    BackgroundColor3 = window.Theme.Card,
-                    Size = UDim2.new(1, 0, 0, 30),
-                    Font = Enum.Font.Gotham,
-                    Text = option,
-                    TextColor3 = window.Theme.Text,
-                    TextSize = 11,
-                    AutoButtonColor = false
-                })
-                
-                optionBtn.MouseEnter:Connect(function()
-                    Tween(optionBtn, {BackgroundColor3 = window.Theme.Primary})
-                end)
-                
-                optionBtn.MouseLeave:Connect(function()
-                    Tween(optionBtn, {BackgroundColor3 = window.Theme.Card})
-                end)
-                
-                optionBtn.MouseButton1Click:Connect(function()
-                    config.Callback(option)
-                    label.Text = config.Text .. ": " .. option
-                    toggleDropdown()
-                end)
-            end
-            
-            return {
-                SetOptions = function(self, newOptions)
-                    -- Options update functionality
-                end
-            }
+            return labelObject
         end
         
         -- Auto select first tab
-        if #tabContainer:GetChildren() == 2 then
-            wait()
+        if #tabContainer:GetChildren() == 2 then -- First tab + UIListLayout
+            task.wait(0.1)
             tabBtn.MouseButton1Click:Connect(function() end)()
         end
         
@@ -706,14 +531,14 @@ function VortexHub:CreateWindow(config)
         return tab
     end
     
-    function window:SetTheme(theme)
-        window.Theme = theme
-        -- Theme update logic here
-    end
-    
-    function window:Destroy()
-        gui:Destroy()
-    end
+    -- Auto select first tab when created
+    task.spawn(function()
+        task.wait(0.2)
+        local firstTabBtn = tabContainer:FindFirstChildOfClass("TextButton")
+        if firstTabBtn then
+            firstTabBtn.MouseButton1Click:Connect(function() end)()
+        end
+    end)
     
     table.insert(self.Windows, window)
     return window
@@ -734,7 +559,7 @@ function VortexHub:Notify(config)
         Name = "Notification",
         Parent = gui,
         BackgroundColor3 = self.Themes.Dark.Surface,
-        Position = UDim2.new(1, -320, 1, -80),
+        Position = UDim2.new(1, 350, 1, -80),
         Size = UDim2.new(0, 300, 0, 60),
         BorderSizePixel = 0
     })
@@ -780,7 +605,7 @@ function VortexHub:Notify(config)
     Tween(notification, {Position = UDim2.new(1, -320, 1, -150)})
     
     task.delay(config.Duration or 3, function()
-        Tween(notification, {Position = UDim2.new(1, -320, 1, -80)})
+        Tween(notification, {Position = UDim2.new(1, 350, 1, -80)})
         task.wait(0.3)
         notification:Destroy()
     end)
