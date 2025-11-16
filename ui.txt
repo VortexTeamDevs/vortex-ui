@@ -1,142 +1,197 @@
--- Venus UI ile Auto Buy Sistemi
--- Modern & Çalışan Library
+-- Simple Auto Buy UI
+-- Kendi Mini Library'miz
 
-local Venus = loadstring(game:HttpGet('https://raw.githubusercontent.com/Stefanuk12/Venus/main/Loader.lua'))()
-
--- Pencere oluştur
-local Window = Venus:Init('Auto Buy System', 'v1.0')
-
--- Sistem değişkenleri
 local AutoBuy = {
     Enabled = false,
-    Tool = "Blackstone Platform",
+    Tool = "Blackstone Platform", 
     Speed = 50,
     Total = 0
 }
 
--- Tab'ları oluştur
-local MainTab = Window:Tab('Ana Sayfa')
-local AutoTab = Window:Tab('Auto Buy')
-local StatsTab = Window:Tab('İstatistikler')
+-- Basit UI Oluştur
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
 
--- Ana Sayfa
-local MainSection = MainTab:Section('Hızlı Kontroller')
-MainSection:Label('Auto Buy System v1.0')
-MainSection:Label('Premium Auto Buy Sistemi')
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
-MainSection:Button('10x Hızlı Al', function()
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(50, 50, 50)
+stroke.Thickness = 1
+stroke.Parent = mainFrame
+
+-- Başlık
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Auto Buy System"
+title.TextSize = 14
+title.Font = Enum.Font.GothamBold
+title.Parent = mainFrame
+
+-- Auto Buy Butonu
+local autoBtn = Instance.new("TextButton")
+autoBtn.Size = UDim2.new(1, -20, 0, 40)
+autoBtn.Position = UDim2.new(0, 10, 0, 40)
+autoBtn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+autoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoBtn.Text = "AUTO BUY: KAPALI"
+autoBtn.TextSize = 12
+autoBtn.Font = Enum.Font.Gotham
+autoBtn.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 6)
+btnCorner.Parent = autoBtn
+
+-- Hızlı Al Butonları
+local quick10 = Instance.new("TextButton")
+quick10.Size = UDim2.new(0.45, 0, 0, 30)
+quick10.Position = UDim2.new(0, 10, 0, 90)
+quick10.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+quick10.TextColor3 = Color3.fromRGB(255, 255, 255)
+quick10.Text = "10x AL"
+quick10.TextSize = 11
+quick10.Font = Enum.Font.Gotham
+quick10.Parent = mainFrame
+
+local quick50 = Instance.new("TextButton")
+quick50.Size = UDim2.new(0.45, 0, 0, 30)
+quick50.Position = UDim2.new(0.55, 0, 0, 90)
+quick50.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+quick50.TextColor3 = Color3.fromRGB(255, 255, 255)
+quick50.Text = "50x AL"
+quick50.TextSize = 11
+quick50.Font = Enum.Font.Gotham
+quick50.Parent = mainFrame
+
+local quickCorner = Instance.new("UICorner")
+quickCorner.CornerRadius = UDim.new(0, 4)
+quickCorner.Parent = quick10
+quickCorner:Clone().Parent = quick50
+
+-- Bilgi Label
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(1, -20, 0, 40)
+infoLabel.Position = UDim2.new(0, 10, 0, 130)
+infoLabel.BackgroundTransparency = 1
+infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+infoLabel.Text = "Toplam: 0\nF Tuşu: Aç/Kapa"
+infoLabel.TextSize = 11
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.Parent = mainFrame
+
+-- Buton Fonksiyonları
+autoBtn.MouseButton1Click:Connect(function()
+    AutoBuy.Enabled = not AutoBuy.Enabled
+    
+    if AutoBuy.Enabled then
+        autoBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 83)
+        autoBtn.Text = "AUTO BUY: AÇIK"
+        
+        -- Auto buy döngüsü
+        while AutoBuy.Enabled do
+            local args = {AutoBuy.Tool, 0}
+            game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
+            AutoBuy.Total = AutoBuy.Total + 1
+            infoLabel.Text = "Toplam: " .. AutoBuy.Total .. "\nF Tuşu: Aç/Kapa"
+            task.wait(0.1)
+        end
+    else
+        autoBtn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+        autoBtn.Text = "AUTO BUY: KAPALI"
+    end
+end)
+
+quick10.MouseButton1Click:Connect(function()
     for i = 1, 10 do
-        local args = {"Blackstone Platform", 0}
+        local args = {AutoBuy.Tool, 0}
         game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
         AutoBuy.Total = AutoBuy.Total + 1
         task.wait(0.05)
     end
-    Venus:Notification('10x Satın Alındı!', '10 adet platform alındı.', 3)
+    infoLabel.Text = "Toplam: " .. AutoBuy.Total .. "\n10x Alındı!"
 end)
 
-MainSection:Button('50x Hızlı Al', function()
+quick50.MouseButton1Click:Connect(function()
     for i = 1, 50 do
-        local args = {"Blackstone Platform", 0}
+        local args = {AutoBuy.Tool, 0}
         game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
         AutoBuy.Total = AutoBuy.Total + 1
         task.wait(0.03)
     end
-    Venus:Notification('50x Satın Alındı!', '50 adet platform alındı.', 3)
+    infoLabel.Text = "Toplam: " .. AutoBuy.Total .. "\n50x Alındı!"
 end)
 
--- Auto Buy Tab
-local AutoSection = AutoTab:Section('Otomatik Sistem')
-local Toggle = AutoSection:Toggle('Auto Buy Açık', false, function(state)
-    AutoBuy.Enabled = state
-    if state then
-        Venus:Notification('Auto Buy Başlatıldı', 'Sistem çalışıyor...', 2)
-        
-        -- Auto buy döngüsü
-        while AutoBuy.Enabled do
-            local args = {"Blackstone Platform", 0}
-            local success = pcall(function()
-                game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
-                AutoBuy.Total = AutoBuy.Total + 1
-            end)
-            
-            if not success then
-                Venus:Notification('Hata!', 'Satın alma başarısız.', 2)
-            end
-            
-            task.wait((100 - AutoBuy.Speed) / 100)
-        end
-    else
-        Venus:Notification('Auto Buy Durduruldu', 'Sistem durdu.', 2)
-    end
-end)
-
-AutoSection:Slider('Hız Ayarı', 1, 100, 50, function(value)
-    AutoBuy.Speed = value
-end)
-
-AutoSection:Button('Acil Durdur', function()
-    AutoBuy.Enabled = false
-    Toggle:Set(false)
-    Venus:Notification('ACİL DURDUR!', 'Tüm sistemler durduruldu.', 3)
-end)
-
--- İstatistikler Tab
-local StatsSection = StatsTab:Section('Sistem İstatistikleri')
-StatsSection:Label('Toplam Satın Alınan: 0')
-StatsSection:Label('Mevcut Hız: 50')
-StatsSection:Label('Sistem Durumu: Kapalı')
-
-StatsSection:Button('İstatistikleri Yenile', function()
-    Venus:Notification('Yenilendi', 'İstatistikler güncellendi.', 1)
-end)
-
-StatsSection:Button('Sayaç Sıfırla', function()
-    AutoBuy.Total = 0
-    Venus:Notification('Sıfırlandı', 'Tüm veriler sıfırlandı.', 2)
-end)
-
--- İstatistik güncelleme
-coroutine.wrap(function()
-    while true do
-        -- İstatistikleri güncelle
-        for i, v in pairs(StatsSection:GetChildren()) do
-            if v.Text then
-                if v.Text:find("Toplam") then
-                    v:Set('Toplam Satın Alınan: ' .. AutoBuy.Total)
-                elseif v.Text:find("Mevcut Hız") then
-                    v:Set('Mevcut Hız: ' .. AutoBuy.Speed)
-                elseif v.Text:find("Sistem Durumu") then
-                    v:Set('Sistem Durumu: ' .. (AutoBuy.Enabled and 'Açık' or 'Kapalı'))
-                end
-            end
-        end
-        task.wait(1)
-    end
-end)()
-
--- Keybind sistemi
+-- Keybind Sistemi
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     
     if input.KeyCode == Enum.KeyCode.F then
         AutoBuy.Enabled = not AutoBuy.Enabled
-        Toggle:Set(AutoBuy.Enabled)
         
-        Venus:Notification(
-            AutoBuy.Enabled and 'Auto Buy Açıldı' or 'Auto Buy Kapandı',
-            'F tuşu ile kontrol edildi.',
-            1
+        if AutoBuy.Enabled then
+            autoBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 83)
+            autoBtn.Text = "AUTO BUY: AÇIK"
+            
+            while AutoBuy.Enabled do
+                local args = {AutoBuy.Tool, 0}
+                game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
+                AutoBuy.Total = AutoBuy.Total + 1
+                infoLabel.Text = "Toplam: " .. AutoBuy.Total .. "\nF Tuşu: Aç/Kapa"
+                task.wait(0.1)
+            end
+        else
+            autoBtn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+            autoBtn.Text = "AUTO BUY: KAPALI"
+        end
+    end
+end)
+
+-- Sürükleme Sistemi
+local dragging = false
+local dragInput, dragStart, startPos
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
         )
     end
 end)
 
--- Başlangıç bildirimi
-Venus:Notification(
-    'Auto Buy Sistemi Hazır!',
-    'F tuşu ile açıp kapatabilirsin.',
-    4
-)
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
 
-print("Venus UI Auto Buy sistemi yüklendi!")
-print("F tuşu: Auto Buy Aç/Kapa")
-print("Özellikler: Hızlı alım, Auto buy, İstatistikler")
+print("Simple Auto Buy UI Yüklendi!")
+print("F Tuşu: Auto Buy Aç/Kapa")
+print("Özellikler: Auto Buy, Hızlı Alım, Sürükleme")
