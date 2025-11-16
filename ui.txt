@@ -1,431 +1,142 @@
--- Flux UI Library
--- Minimal & Modern Design
--- Created by Late
+-- Venus UI ile Auto Buy Sistemi
+-- Modern & Çalışan Library
 
-local Flux = {}
+local Venus = loadstring(game:HttpGet('https://raw.githubusercontent.com/Stefanuk12/Venus/main/Loader.lua'))()
 
-Flux.Themes = {
-    Dark = {
-        Primary = Color3.fromRGB(0, 122, 255),
-        Secondary = Color3.fromRGB(40, 40, 40),
-        Background = Color3.fromRGB(20, 20, 20),
-        Surface = Color3.fromRGB(30, 30, 30),
-        Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(180, 180, 180),
-        Border = Color3.fromRGB(50, 50, 50)
-    },
-    Midnight = {
-        Primary = Color3.fromRGB(88, 86, 214),
-        Secondary = Color3.fromRGB(25, 25, 35),
-        Background = Color3.fromRGB(15, 15, 25),
-        Surface = Color3.fromRGB(35, 35, 45),
-        Text = Color3.fromRGB(240, 240, 255),
-        SubText = Color3.fromRGB(170, 170, 190),
-        Border = Color3.fromRGB(60, 60, 80)
-    }
+-- Pencere oluştur
+local Window = Venus:Init('Auto Buy System', 'v1.0')
+
+-- Sistem değişkenleri
+local AutoBuy = {
+    Enabled = false,
+    Tool = "Blackstone Platform",
+    Speed = 50,
+    Total = 0
 }
 
-function Flux:CreateWindow(config)
-    config = config or {}
-    local theme = config.Theme or self.Themes.Dark
-    
-    -- Create UI
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.Name = "FluxUI"
-    
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 350, 0, 400)
-    MainFrame.Position = UDim2.new(0.5, -175, 0.5, -200)
-    MainFrame.BackgroundColor3 = theme.Background
-    MainFrame.BorderSizePixel = 0
-    
-    local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 8)
-    Corner.Parent = MainFrame
-    
-    local Stroke = Instance.new("UIStroke")
-    Stroke.Color = theme.Border
-    Stroke.Thickness = 1
-    Stroke.Parent = MainFrame
-    
-    -- Header
-    local Header = Instance.new("Frame")
-    Header.Parent = MainFrame
-    Header.Size = UDim2.new(1, 0, 0, 40)
-    Header.BackgroundColor3 = theme.Surface
-    Header.BorderSizePixel = 0
-    
-    local HeaderCorner = Instance.new("UICorner")
-    HeaderCorner.CornerRadius = UDim.new(0, 8)
-    HeaderCorner.Parent = Header
-    
-    local Title = Instance.new("TextLabel")
-    Title.Parent = Header
-    Title.Size = UDim2.new(1, -50, 1, 0)
-    Title.Position = UDim2.new(0, 15, 0, 0)
-    Title.BackgroundTransparency = 1
-    Title.Text = config.Name or "Flux UI"
-    Title.TextColor3 = theme.Text
-    Title.TextSize = 14
-    Title.Font = Enum.Font.GothamBold
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-    
-    -- Tab Container
-    local TabContainer = Instance.new("Frame")
-    TabContainer.Parent = MainFrame
-    TabContainer.Size = UDim2.new(0, 80, 0, 360)
-    TabContainer.Position = UDim2.new(0, 0, 0, 40)
-    TabContainer.BackgroundColor3 = theme.Surface
-    TabContainer.BorderSizePixel = 0
-    
-    local TabList = Instance.new("UIListLayout")
-    TabList.Parent = TabContainer
-    TabList.Padding = UDim.new(0, 5)
-    TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    
-    local TabPadding = Instance.new("UIPadding")
-    TabPadding.Parent = TabContainer
-    TabPadding.PaddingTop = UDim.new(0, 10)
-    
-    -- Content Area
-    local ContentFrame = Instance.new("Frame")
-    ContentFrame.Parent = MainFrame
-    ContentFrame.Size = UDim2.new(0, 270, 0, 360)
-    ContentFrame.Position = UDim2.new(0, 80, 0, 40)
-    ContentFrame.BackgroundColor3 = theme.Background
-    ContentFrame.BorderSizePixel = 0
-    
-    local PagesFolder = Instance.new("Folder")
-    PagesFolder.Parent = ContentFrame
-    
-    -- Drag Functionality
-    local dragging = false
-    local dragStart, startPos
-    
-    Header.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-        end
-    end)
-    
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-    
-    game:GetService("UserInputService").InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-    
-    local window = {}
-    
-    function window:CreateTab(name)
-        local tab = {}
-        
-        -- Tab Button
-        local TabButton = Instance.new("TextButton")
-        TabButton.Parent = TabContainer
-        TabButton.Size = UDim2.new(0, 70, 0, 30)
-        TabButton.BackgroundColor3 = theme.Surface
-        TabButton.Text = name
-        TabButton.TextColor3 = theme.SubText
-        TabButton.TextSize = 11
-        TabButton.Font = Enum.Font.Gotham
-        TabButton.AutoButtonColor = false
-        
-        local TabCorner = Instance.new("UICorner")
-        TabCorner.CornerRadius = UDim.new(0, 6)
-        TabCorner.Parent = TabButton
-        
-        -- Tab Content
-        local TabContent = Instance.new("ScrollingFrame")
-        TabContent.Parent = PagesFolder
-        TabContent.Size = UDim2.new(1, 0, 1, 0)
-        TabContent.BackgroundTransparency = 1
-        TabContent.ScrollBarThickness = 3
-        TabContent.ScrollBarImageColor3 = theme.Primary
-        TabContent.Visible = false
-        
-        local ContentList = Instance.new("UIListLayout")
-        ContentList.Parent = TabContent
-        ContentList.Padding = UDim.new(0, 8)
-        
-        local ContentPadding = Instance.new("UIPadding")
-        ContentPadding.Parent = TabContent
-        ContentPadding.PaddingLeft = UDim.new(0, 10)
-        ContentPadding.PaddingTop = UDim.new(0, 10)
-        ContentPadding.PaddingRight = UDim.new(0, 10)
-        
-        -- Auto Resize
-        ContentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentList.AbsoluteContentSize.Y + 20)
-        end)
-        
-        -- Tab Selection
-        TabButton.MouseButton1Click:Connect(function()
-            for _, page in ipairs(PagesFolder:GetChildren()) do
-                page.Visible = false
-            end
-            
-            for _, btn in ipairs(TabContainer:GetChildren()) do
-                if btn:IsA("TextButton") then
-                    btn.BackgroundColor3 = theme.Surface
-                    btn.TextColor3 = theme.SubText
-                end
-            end
-            
-            TabContent.Visible = true
-            TabButton.BackgroundColor3 = theme.Primary
-            TabButton.TextColor3 = theme.Text
-        end)
-        
-        -- Element Methods
-        function tab:Button(config)
-            local Button = Instance.new("TextButton")
-            Button.Parent = TabContent
-            Button.Size = UDim2.new(1, 0, 0, 36)
-            Button.BackgroundColor3 = theme.Primary
-            Button.Text = config.Text
-            Button.TextColor3 = theme.Text
-            Button.TextSize = 12
-            Button.Font = Enum.Font.Gotham
-            Button.AutoButtonColor = false
-            
-            local ButtonCorner = Instance.new("UICorner")
-            ButtonCorner.CornerRadius = UDim.new(0, 6)
-            ButtonCorner.Parent = Button
-            
-            -- Hover Effects
-            Button.MouseEnter:Connect(function()
-                game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {
-                    BackgroundColor3 = Color3.fromRGB(
-                        math.min(255, theme.Primary.R * 255 + 25),
-                        math.min(255, theme.Primary.G * 255 + 25),
-                        math.min(255, theme.Primary.B * 255 + 25)
-                    )
-                }):Play()
-            end)
-            
-            Button.MouseLeave:Connect(function()
-                game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {
-                    BackgroundColor3 = theme.Primary
-                }):Play()
-            end)
-            
-            Button.MouseButton1Click:Connect(config.Callback)
-            
-            return Button
-        end
-        
-        function tab:Toggle(config)
-            local ToggleFrame = Instance.new("Frame")
-            ToggleFrame.Parent = TabContent
-            ToggleFrame.Size = UDim2.new(1, 0, 0, 32)
-            ToggleFrame.BackgroundColor3 = theme.Surface
-            ToggleFrame.BorderSizePixel = 0
-            
-            local ToggleCorner = Instance.new("UICorner")
-            ToggleCorner.CornerRadius = UDim.new(0, 6)
-            ToggleCorner.Parent = ToggleFrame
-            
-            local Label = Instance.new("TextLabel")
-            Label.Parent = ToggleFrame
-            Label.Size = UDim2.new(0, 180, 1, 0)
-            Label.Position = UDim2.new(0, 10, 0, 0)
-            Label.BackgroundTransparency = 1
-            Label.Text = config.Text
-            Label.TextColor3 = theme.Text
-            Label.TextSize = 12
-            Label.Font = Enum.Font.Gotham
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            
-            local ToggleButton = Instance.new("TextButton")
-            ToggleButton.Parent = ToggleFrame
-            ToggleButton.Size = UDim2.new(0, 40, 0, 20)
-            ToggleButton.Position = UDim2.new(1, -50, 0.5, -10)
-            ToggleButton.BackgroundColor3 = theme.Secondary
-            ToggleButton.AutoButtonColor = false
-            ToggleButton.Text = ""
-            
-            local ToggleCorner2 = Instance.new("UICorner")
-            ToggleCorner2.CornerRadius = UDim.new(1, 0)
-            ToggleCorner2.Parent = ToggleButton
-            
-            local ToggleCircle = Instance.new("Frame")
-            ToggleCircle.Parent = ToggleButton
-            ToggleCircle.Size = UDim2.new(0, 16, 0, 16)
-            ToggleCircle.Position = UDim2.new(0, 2, 0.5, -8)
-            ToggleCircle.BackgroundColor3 = theme.Text
-            
-            local CircleCorner = Instance.new("UICorner")
-            CircleCorner.CornerRadius = UDim.new(1, 0)
-            CircleCorner.Parent = ToggleCircle
-            
-            local state = config.Default or false
-            
-            local function updateToggle()
-                if state then
-                    ToggleButton.BackgroundColor3 = theme.Primary
-                    ToggleCircle.Position = UDim2.new(1, -18, 0.5, -8)
-                else
-                    ToggleButton.BackgroundColor3 = theme.Secondary
-                    ToggleCircle.Position = UDim2.new(0, 2, 0.5, -8)
-                end
-                config.Callback(state)
-            end
-            
-            ToggleButton.MouseButton1Click:Connect(function()
-                state = not state
-                updateToggle()
-            end)
-            
-            updateToggle()
-            
-            return {
-                SetValue = function(self, value)
-                    state = value
-                    updateToggle()
-                end
-            }
-        end
-        
-        function tab:Label(config)
-            local Label = Instance.new("TextLabel")
-            Label.Parent = TabContent
-            Label.Size = UDim2.new(1, 0, 0, 20)
-            Label.BackgroundTransparency = 1
-            Label.Text = config.Text
-            Label.TextColor3 = config.Color or theme.SubText
-            Label.TextSize = 11
-            Label.Font = Enum.Font.Gotham
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            
-            return {
-                SetText = function(self, text)
-                    Label.Text = text
-                end
-            }
-        end
-        
-        function tab:Slider(config)
-            local SliderFrame = Instance.new("Frame")
-            SliderFrame.Parent = TabContent
-            SliderFrame.Size = UDim2.new(1, 0, 0, 50)
-            SliderFrame.BackgroundColor3 = theme.Surface
-            SliderFrame.BorderSizePixel = 0
-            
-            local SliderCorner = Instance.new("UICorner")
-            SliderCorner.CornerRadius = UDim.new(0, 6)
-            SliderCorner.Parent = SliderFrame
-            
-            local Label = Instance.new("TextLabel")
-            Label.Parent = SliderFrame
-            Label.Size = UDim2.new(0, 180, 0, 15)
-            Label.Position = UDim2.new(0, 10, 0, 8)
-            Label.BackgroundTransparency = 1
-            Label.Text = config.Text
-            Label.TextColor3 = theme.Text
-            Label.TextSize = 12
-            Label.Font = Enum.Font.Gotham
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            
-            local ValueLabel = Instance.new("TextLabel")
-            ValueLabel.Parent = SliderFrame
-            ValueLabel.Size = UDim2.new(0, 40, 0, 15)
-            ValueLabel.Position = UDim2.new(1, -50, 0, 8)
-            ValueLabel.BackgroundTransparency = 1
-            ValueLabel.Text = tostring(config.Default or 0)
-            ValueLabel.TextColor3 = theme.SubText
-            ValueLabel.TextSize = 11
-            ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-            
-            local Track = Instance.new("Frame")
-            Track.Parent = SliderFrame
-            Track.Size = UDim2.new(1, -20, 0, 6)
-            Track.Position = UDim2.new(0, 10, 0, 35)
-            Track.BackgroundColor3 = theme.Secondary
-            Track.BorderSizePixel = 0
-            
-            local TrackCorner = Instance.new("UICorner")
-            TrackCorner.CornerRadius = UDim.new(1, 0)
-            TrackCorner.Parent = Track
-            
-            local Fill = Instance.new("Frame")
-            Fill.Parent = Track
-            Fill.Size = UDim2.new((config.Default or 0) / (config.Max or 100), 0, 1, 0)
-            Fill.BackgroundColor3 = theme.Primary
-            Fill.BorderSizePixel = 0
-            
-            local FillCorner = Instance.new("UICorner")
-            FillCorner.CornerRadius = UDim.new(1, 0)
-            FillCorner.Parent = Fill
-            
-            local SliderButton = Instance.new("TextButton")
-            SliderButton.Parent = Track
-            SliderButton.Size = UDim2.new(1, 0, 1, 0)
-            SliderButton.BackgroundTransparency = 1
-            SliderButton.Text = ""
-            SliderButton.ZIndex = 2
-            
-            local min = config.Min or 0
-            local max = config.Max or 100
-            local value = config.Default or min
-            
-            local function updateSlider(newValue)
-                value = math.clamp(newValue, min, max)
-                local scale = (value - min) / (max - min)
-                Fill.Size = UDim2.new(scale, 0, 1, 0)
-                ValueLabel.Text = tostring(math.floor(value))
-                config.Callback(value)
-            end
-            
-            SliderButton.MouseButton1Down:Connect(function()
-                local connection
-                connection = game:GetService("UserInputService").InputChanged:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseMovement then
-                        local pos = Track.AbsolutePosition
-                        local size = Track.AbsoluteSize
-                        local x = math.clamp(input.Position.X - pos.X, 0, size.X)
-                        local newValue = min + (x / size.X) * (max - min)
-                        updateSlider(newValue)
-                    end
-                end)
-                
-                game:GetService("UserInputService").InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        connection:Disconnect()
-                    end
-                end)
-            end)
-            
-            return {
-                SetValue = function(self, newValue)
-                    updateSlider(newValue)
-                end
-            }
-        end
-        
-        -- Auto select first tab
-        if #TabContainer:GetChildren() == 2 then
-            task.wait()
-            TabButton.MouseButton1Click:Connect(function() end)()
-        end
-        
-        return tab
-    end
-    
-    return window
-end
+-- Tab'ları oluştur
+local MainTab = Window:Tab('Ana Sayfa')
+local AutoTab = Window:Tab('Auto Buy')
+local StatsTab = Window:Tab('İstatistikler')
 
-return Flux
+-- Ana Sayfa
+local MainSection = MainTab:Section('Hızlı Kontroller')
+MainSection:Label('Auto Buy System v1.0')
+MainSection:Label('Premium Auto Buy Sistemi')
+
+MainSection:Button('10x Hızlı Al', function()
+    for i = 1, 10 do
+        local args = {"Blackstone Platform", 0}
+        game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
+        AutoBuy.Total = AutoBuy.Total + 1
+        task.wait(0.05)
+    end
+    Venus:Notification('10x Satın Alındı!', '10 adet platform alındı.', 3)
+end)
+
+MainSection:Button('50x Hızlı Al', function()
+    for i = 1, 50 do
+        local args = {"Blackstone Platform", 0}
+        game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
+        AutoBuy.Total = AutoBuy.Total + 1
+        task.wait(0.03)
+    end
+    Venus:Notification('50x Satın Alındı!', '50 adet platform alındı.', 3)
+end)
+
+-- Auto Buy Tab
+local AutoSection = AutoTab:Section('Otomatik Sistem')
+local Toggle = AutoSection:Toggle('Auto Buy Açık', false, function(state)
+    AutoBuy.Enabled = state
+    if state then
+        Venus:Notification('Auto Buy Başlatıldı', 'Sistem çalışıyor...', 2)
+        
+        -- Auto buy döngüsü
+        while AutoBuy.Enabled do
+            local args = {"Blackstone Platform", 0}
+            local success = pcall(function()
+                game:GetService("ReplicatedStorage"):WaitForChild("PurchaseTool"):FireServer(unpack(args))
+                AutoBuy.Total = AutoBuy.Total + 1
+            end)
+            
+            if not success then
+                Venus:Notification('Hata!', 'Satın alma başarısız.', 2)
+            end
+            
+            task.wait((100 - AutoBuy.Speed) / 100)
+        end
+    else
+        Venus:Notification('Auto Buy Durduruldu', 'Sistem durdu.', 2)
+    end
+end)
+
+AutoSection:Slider('Hız Ayarı', 1, 100, 50, function(value)
+    AutoBuy.Speed = value
+end)
+
+AutoSection:Button('Acil Durdur', function()
+    AutoBuy.Enabled = false
+    Toggle:Set(false)
+    Venus:Notification('ACİL DURDUR!', 'Tüm sistemler durduruldu.', 3)
+end)
+
+-- İstatistikler Tab
+local StatsSection = StatsTab:Section('Sistem İstatistikleri')
+StatsSection:Label('Toplam Satın Alınan: 0')
+StatsSection:Label('Mevcut Hız: 50')
+StatsSection:Label('Sistem Durumu: Kapalı')
+
+StatsSection:Button('İstatistikleri Yenile', function()
+    Venus:Notification('Yenilendi', 'İstatistikler güncellendi.', 1)
+end)
+
+StatsSection:Button('Sayaç Sıfırla', function()
+    AutoBuy.Total = 0
+    Venus:Notification('Sıfırlandı', 'Tüm veriler sıfırlandı.', 2)
+end)
+
+-- İstatistik güncelleme
+coroutine.wrap(function()
+    while true do
+        -- İstatistikleri güncelle
+        for i, v in pairs(StatsSection:GetChildren()) do
+            if v.Text then
+                if v.Text:find("Toplam") then
+                    v:Set('Toplam Satın Alınan: ' .. AutoBuy.Total)
+                elseif v.Text:find("Mevcut Hız") then
+                    v:Set('Mevcut Hız: ' .. AutoBuy.Speed)
+                elseif v.Text:find("Sistem Durumu") then
+                    v:Set('Sistem Durumu: ' .. (AutoBuy.Enabled and 'Açık' or 'Kapalı'))
+                end
+            end
+        end
+        task.wait(1)
+    end
+end)()
+
+-- Keybind sistemi
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.F then
+        AutoBuy.Enabled = not AutoBuy.Enabled
+        Toggle:Set(AutoBuy.Enabled)
+        
+        Venus:Notification(
+            AutoBuy.Enabled and 'Auto Buy Açıldı' or 'Auto Buy Kapandı',
+            'F tuşu ile kontrol edildi.',
+            1
+        )
+    end
+end)
+
+-- Başlangıç bildirimi
+Venus:Notification(
+    'Auto Buy Sistemi Hazır!',
+    'F tuşu ile açıp kapatabilirsin.',
+    4
+)
+
+print("Venus UI Auto Buy sistemi yüklendi!")
+print("F tuşu: Auto Buy Aç/Kapa")
+print("Özellikler: Hızlı alım, Auto buy, İstatistikler")
