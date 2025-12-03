@@ -1,11 +1,6 @@
 --[[
-    VORTEX UI - ÖZELLEŞTİRİLMİŞ VERSİYON
-    Özellikler:
-    1. V Logosu - UI açma/kapama butonu
-    2. Loading ekranı "Vortex UI Loading" yazılı
-    3. Frame boyutu %20 küçültüldü
-    4. Modern tasarım, mavi-siyah tonlar
-    5. Marka: Vortex UI
+    VORTEX UI - PROFESYONEL VERSİYON
+    Temiz, minimalist ve hatasız tasarım
 ]]
 
 -- Services
@@ -14,458 +9,295 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
-local HttpService = game:GetService("HttpService")
 
 -- Variables
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
--- Utility Functions
-local function CreateInstance(className, properties)
-    local instance = Instance.new(className)
-    for property, value in pairs(properties) do
-        instance[property] = value
+-- Utility
+local function Create(className, props)
+    local obj = Instance.new(className)
+    for prop, val in pairs(props) do
+        if prop ~= "Parent" then
+            obj[prop] = val
+        end
     end
-    return instance
+    if props.Parent then
+        obj.Parent = props.Parent
+    end
+    return obj
 end
 
-local function Tween(instance, properties, duration, easingStyle)
-    local tweenInfo = TweenInfo.new(
-        duration or 0.3,
-        easingStyle or Enum.EasingStyle.Quint,
-        Enum.EasingDirection.Out
-    )
-    local tween = TweenService:Create(instance, tweenInfo, properties)
+local function Tween(obj, props, duration, easing)
+    local tween = TweenService:Create(obj, TweenInfo.new(duration or 0.2, easing or Enum.EasingStyle.Quart), props)
     tween:Play()
     return tween
 end
 
--- V Logosu Renkleri
-local VLogoColors = {
-    LightBlue = Color3.fromRGB(100, 149, 237),    -- Açık Mavi (CornflowerBlue)
-    MediumBlue = Color3.fromRGB(65, 105, 225),    -- Orta Mavi (RoyalBlue)
-    DarkBlue = Color3.fromRGB(25, 25, 112),       -- Koyu Mavi (MidnightBlue)
-    AccentBlue = Color3.fromRGB(30, 144, 255),    -- Vurgu Mavisi (DodgerBlue)
-    NeonBlue = Color3.fromRGB(0, 191, 255)        -- Neon Mavi (DeepSkyBlue)
+-- Renk Paleti
+local Colors = {
+    Background = Color3.fromRGB(20, 20, 25),
+    Container = Color3.fromRGB(30, 30, 40),
+    Element = Color3.fromRGB(40, 40, 55),
+    Border = Color3.fromRGB(60, 60, 80),
+    Text = Color3.fromRGB(240, 240, 245),
+    SubText = Color3.fromRGB(180, 180, 200),
+    Accent = Color3.fromRGB(0, 150, 255),
+    Success = Color3.fromRGB(0, 200, 100),
+    Error = Color3.fromRGB(255, 80, 80),
+    Warning = Color3.fromRGB(255, 180, 50)
 }
 
--- Tema Sistemi
-local Themes = {
-    Vortex = {
-        Background = Color3.fromRGB(15, 15, 25),
-        Foreground = Color3.fromRGB(25, 25, 35),
-        Container = Color3.fromRGB(35, 35, 45),
-        Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(180, 180, 200),
-        Accent = VLogoColors.NeonBlue,
-        Secondary = VLogoColors.MediumBlue,
-        Border = Color3.fromRGB(50, 50, 70),
-        Success = Color3.fromRGB(85, 255, 85),
-        Error = Color3.fromRGB(255, 85, 85),
-        Warning = Color3.fromRGB(255, 255, 85),
-        LogoPrimary = VLogoColors.NeonBlue,
-        LogoSecondary = VLogoColors.MediumBlue,
-        LogoAccent = VLogoColors.DarkBlue,
-        GradientStart = VLogoColors.NeonBlue,
-        GradientEnd = VLogoColors.DarkBlue
-    }
-}
-
--- V Logosu Oluşturma Fonksiyonu (Tıklanabilir)
-local function CreateVLogo(parent, theme, size, isButton)
-    local logoContainer = CreateInstance("Frame", {
-        Name = "VortexLogo",
+-- V Logosu
+local function CreateVLogo(parent, size)
+    local container = Create("Frame", {
         Parent = parent,
+        Name = "VLogo",
         BackgroundTransparency = 1,
-        Size = size or UDim2.new(0, 40, 0, 40),
+        Size = size or UDim2.new(0, 32, 0, 32),
         Position = UDim2.new(0, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5)
     })
     
-    -- Logo butonu (arka plan)
-    local logoButton = nil
-    if isButton then
-        logoButton = CreateInstance("TextButton", {
-            Name = "LogoButton",
-            Parent = logoContainer,
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 1, 0),
-            Text = "",
-            AutoButtonColor = false
-        })
-    end
-    
-    -- V şekli için üçgenler
-    local leftTriangle = CreateInstance("Frame", {
-        Name = "LeftTriangle",
-        Parent = logoContainer,
-        BackgroundColor3 = theme.LogoPrimary,
+    -- V şekli
+    local left = Create("Frame", {
+        Parent = container,
+        BackgroundColor3 = Colors.Accent,
+        Size = UDim2.new(0, 3, 0.8, 0),
         Position = UDim2.new(0.3, 0, 0.1, 0),
-        Size = UDim2.new(0, 4, 0.8, 0),
-        Rotation = -45
+        Rotation = -25
     })
     
-    local rightTriangle = CreateInstance("Frame", {
-        Name = "RightTriangle",
-        Parent = logoContainer,
-        BackgroundColor3 = theme.LogoPrimary,
+    local right = Create("Frame", {
+        Parent = container,
+        BackgroundColor3 = Colors.Accent,
+        Size = UDim2.new(0, 3, 0.8, 0),
         Position = UDim2.new(0.7, 0, 0.1, 0),
-        Size = UDim2.new(0, 4, 0.8, 0),
-        Rotation = 45
+        Rotation = 25
     })
     
-    -- Gradient efekti
-    local leftGradient = CreateInstance("UIGradient", {
-        Parent = leftTriangle,
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, theme.LogoPrimary),
-            ColorSequenceKeypoint.new(1, theme.LogoSecondary)
-        }),
-        Rotation = 90
-    })
+    Create("UICorner", {Parent = left, CornerRadius = UDim.new(1, 0)})
+    Create("UICorner", {Parent = right, CornerRadius = UDim.new(1, 0)})
     
-    local rightGradient = CreateInstance("UIGradient", {
-        Parent = rightTriangle,
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, theme.LogoPrimary),
-            ColorSequenceKeypoint.new(1, theme.LogoSecondary)
-        }),
-        Rotation = 90
-    })
-    
-    -- Logo parıltısı
-    local glow = CreateInstance("Frame", {
-        Name = "LogoGlow",
-        Parent = logoContainer,
-        BackgroundColor3 = theme.LogoPrimary,
-        BackgroundTransparency = 0.9,
-        Size = UDim2.new(2, 0, 2, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        ZIndex = -1
-    })
-    
-    CreateInstance("UICorner", {
-        Parent = glow,
-        CornerRadius = UDim.new(1, 0)
-    })
-    
-    -- Logo animasyonu
-    coroutine.wrap(function()
-        while logoContainer and logoContainer.Parent do
-            Tween(glow, {Size = UDim2.new(2.5, 0, 2.5, 0), BackgroundTransparency = 0.7}, 1.5)
-            wait(1.5)
-            Tween(glow, {Size = UDim2.new(2, 0, 2, 0), BackgroundTransparency = 0.9}, 1.5)
-            wait(1.5)
-        end
-    end)()
-    
-    return logoContainer, logoButton
+    return container
 end
 
--- Vortex UI Library
+-- Vortex UI
 local Vortex = {}
 
 function Vortex:CreateWindow(options)
     options = options or {}
     
-    local windowName = options.Name or "Vortex UI"
-    local theme = Themes.Vortex
-    local isUIVisible = true
-    
-    -- Main Container
-    local screenGui = CreateInstance("ScreenGui", {
+    local screenGui = Create("ScreenGui", {
         Parent = CoreGui,
-        Name = "VortexUIMain",
+        Name = "VortexUI",
         ResetOnSpawn = false,
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-        DisplayOrder = 999
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     })
     
-    -- LOADING EKRANI
-    local loadingFrame = CreateInstance("Frame", {
+    -- Loading Screen
+    local loading = Create("Frame", {
         Parent = screenGui,
-        Name = "LoadingScreen",
-        BackgroundColor3 = Color3.fromRGB(10, 10, 15),
+        Name = "Loading",
+        BackgroundColor3 = Colors.Background,
         Size = UDim2.new(1, 0, 1, 0),
-        Position = UDim2.new(0, 0, 0, 0),
-        BackgroundTransparency = 0,
         ZIndex = 1000
     })
     
-    local loadingContainer = CreateInstance("Frame", {
-        Parent = loadingFrame,
-        Name = "LoadingContainer",
-        BackgroundColor3 = theme.Background,
-        BackgroundTransparency = 0.2,
-        Size = UDim2.new(0, 400, 0, 200),
+    local loadingContent = Create("Frame", {
+        Parent = loading,
+        BackgroundColor3 = Colors.Container,
+        Size = UDim2.new(0, 300, 0, 150),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5)
     })
     
-    CreateInstance("UICorner", {
-        Parent = loadingContainer,
-        CornerRadius = UDim.new(0, 16)
-    })
-    
-    CreateInstance("UIStroke", {
-        Parent = loadingContainer,
-        Color = theme.Accent,
-        Thickness = 2,
-        Transparency = 0.5
-    })
+    Create("UICorner", {Parent = loadingContent, CornerRadius = UDim.new(0, 8)})
+    Create("UIStroke", {Parent = loadingContent, Color = Colors.Border, Thickness = 2})
     
     -- Loading logosu
-    local loadingLogo, _ = CreateVLogo(loadingContainer, theme, UDim2.new(0, 80, 0, 80))
+    local loadingLogo = CreateVLogo(loadingContent, UDim2.new(0, 50, 0, 50))
     loadingLogo.Position = UDim2.new(0.5, 0, 0.3, 0)
     loadingLogo.AnchorPoint = Vector2.new(0.5, 0.5)
     
     -- Loading yazısı
-    local loadingText = CreateInstance("TextLabel", {
-        Parent = loadingContainer,
-        Name = "LoadingText",
+    Create("TextLabel", {
+        Parent = loadingContent,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0.7, 0),
-        Size = UDim2.new(1, 0, 0, 40),
-        Font = Enum.Font.GothamBold,
-        Text = "VORTEX UI LOADING",
-        TextColor3 = theme.Text,
-        TextSize = 24,
-        TextTransparency = 0
+        Position = UDim2.new(0, 0, 0.6, 0),
+        Size = UDim2.new(1, 0, 0, 30),
+        Font = Enum.Font.GothamSemibold,
+        Text = "VORTEX UI",
+        TextColor3 = Colors.Text,
+        TextSize = 20
     })
     
-    local loadingDots = CreateInstance("TextLabel", {
-        Parent = loadingContainer,
-        Name = "LoadingDots",
+    Create("TextLabel", {
+        Parent = loadingContent,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0.85, 0),
+        Position = UDim2.new(0, 0, 0.75, 0),
         Size = UDim2.new(1, 0, 0, 20),
         Font = Enum.Font.Gotham,
-        Text = "",
-        TextColor3 = theme.Accent,
-        TextSize = 18,
-        TextTransparency = 0
+        Text = "Loading...",
+        TextColor3 = Colors.SubText,
+        TextSize = 14
     })
     
-    -- Loading animasyonu
-    coroutine.wrap(function()
-        local dots = {".", "..", "...", "...."}
-        local dotIndex = 1
-        while loadingDots and loadingDots.Parent do
-            loadingDots.Text = dots[dotIndex]
-            dotIndex = dotIndex + 1
-            if dotIndex > #dots then dotIndex = 1 end
-            wait(0.5)
-        end
-    end)()
-    
     -- Loading bar
-    local loadingBarBg = CreateInstance("Frame", {
-        Parent = loadingContainer,
-        Name = "LoadingBarBg",
-        BackgroundColor3 = theme.Container,
+    local barBg = Create("Frame", {
+        Parent = loadingContent,
+        BackgroundColor3 = Colors.Element,
         Position = UDim2.new(0.1, 0, 0.9, 0),
         Size = UDim2.new(0.8, 0, 0, 4)
     })
     
-    CreateInstance("UICorner", {
-        Parent = loadingBarBg,
-        CornerRadius = UDim.new(1, 0)
-    })
+    Create("UICorner", {Parent = barBg, CornerRadius = UDim.new(1, 0)})
     
-    local loadingBar = CreateInstance("Frame", {
-        Parent = loadingBarBg,
-        Name = "LoadingBar",
-        BackgroundColor3 = theme.Accent,
+    local bar = Create("Frame", {
+        Parent = barBg,
+        BackgroundColor3 = Colors.Accent,
         Size = UDim2.new(0, 0, 1, 0)
     })
     
-    CreateInstance("UICorner", {
-        Parent = loadingBar,
-        CornerRadius = UDim.new(1, 0)
-    })
+    Create("UICorner", {Parent = bar, CornerRadius = UDim.new(1, 0)})
     
-    -- Main UI Frame (%20 DAHA KÜÇÜK)
-    local mainFrame = CreateInstance("Frame", {
+    -- Main UI (500x400)
+    local main = Create("Frame", {
         Parent = screenGui,
-        Name = "MainFrame",
-        BackgroundColor3 = theme.Background,
+        Name = "Main",
+        BackgroundColor3 = Colors.Background,
+        Size = UDim2.new(0, 500, 0, 400),
         Position = UDim2.new(0.5, 0, 0.5, 0),
-        Size = UDim2.new(0, 480, 0, 320),  -- Normal 600x400 idi, %20 küçültülmüş
         AnchorPoint = Vector2.new(0.5, 0.5),
-        ClipsDescendants = true,
         Visible = false
     })
     
-    CreateInstance("UICorner", {
-        Parent = mainFrame,
-        CornerRadius = UDim.new(0, 14)
-    })
-    
-    local mainStroke = CreateInstance("UIStroke", {
-        Parent = mainFrame,
-        Color = theme.Accent,
-        Thickness = 2,
-        Transparency = 0.3
-    })
-    
-    -- Glow efekti
-    local glowEffect = CreateInstance("ImageLabel", {
-        Parent = mainFrame,
-        Name = "GlowEffect",
-        BackgroundTransparency = 1,
-        Image = "rbxassetid://8992230670",
-        ImageColor3 = theme.Accent,
-        ImageTransparency = 0.9,
-        ScaleType = Enum.ScaleType.Slice,
-        SliceCenter = Rect.new(256, 256, 256, 256),
-        Size = UDim2.new(1, 60, 1, 60),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        ZIndex = -1
-    })
+    Create("UICorner", {Parent = main, CornerRadius = UDim.new(0, 8)})
+    Create("UIStroke", {Parent = main, Color = Colors.Border, Thickness = 2})
     
     -- Header
-    local header = CreateInstance("Frame", {
-        Parent = mainFrame,
+    local header = Create("Frame", {
+        Parent = main,
         Name = "Header",
-        BackgroundColor3 = theme.Foreground,
-        Size = UDim2.new(1, 0, 0, 50),
-        Position = UDim2.new(0, 0, 0, 0)
+        BackgroundColor3 = Colors.Container,
+        Size = UDim2.new(1, 0, 0, 45)
     })
     
-    CreateInstance("UICorner", {
+    Create("UICorner", {
         Parent = header,
-        CornerRadius = UDim.new(0, 14)
+        CornerRadius = UDim.new(0, 8)
     })
     
-    -- V Logosu (TIKLANABİLİR - UI Aç/Kapa)
-    local logoContainer, logoButton = CreateVLogo(header, theme, UDim2.new(0, 36, 0, 36), true)
-    logoContainer.Position = UDim2.new(0, 15, 0.5, 0)
-    logoContainer.AnchorPoint = Vector2.new(0, 0.5)
+    -- V Logosu (UI Toggle)
+    local logoButton = Create("TextButton", {
+        Parent = header,
+        Name = "LogoButton",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(0, 45, 0, 45),
+        Text = "",
+        AutoButtonColor = false
+    })
+    
+    local logo = CreateVLogo(logoButton, UDim2.new(0, 24, 0, 24))
+    logo.Position = UDim2.new(0.5, 0, 0.5, 0)
+    logo.AnchorPoint = Vector2.new(0.5, 0.5)
     
     -- Başlık
-    local titleLabel = CreateInstance("TextLabel", {
+    Create("TextLabel", {
         Parent = header,
-        Name = "Title",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 60, 0, 0),
-        Size = UDim2.new(1, -60, 1, 0),
-        Font = Enum.Font.GothamBold,
-        Text = windowName,
-        TextColor3 = theme.Text,
-        TextSize = 18,
+        Position = UDim2.new(0, 50, 0, 0),
+        Size = UDim2.new(1, -50, 1, 0),
+        Font = Enum.Font.GothamSemibold,
+        Text = options.Name or "Vortex UI",
+        TextColor3 = Colors.Text,
+        TextSize = 16,
         TextXAlignment = Enum.TextXAlignment.Left
     })
     
-    -- Logo tıklama efekti
-    if logoButton then
-        logoButton.MouseEnter:Connect(function()
-            Tween(logoContainer, {Size = UDim2.new(0, 38, 0, 38)}, 0.2)
-        end)
-        
-        logoButton.MouseLeave:Connect(function()
-            Tween(logoContainer, {Size = UDim2.new(0, 36, 0, 36)}, 0.2)
-        end)
-        
-        logoButton.MouseButton1Click:Connect(function()
-            isUIVisible = not isUIVisible
-            if isUIVisible then
-                Tween(mainFrame, {Size = UDim2.new(0, 480, 0, 320)}, 0.3, Enum.EasingStyle.Back)
-                Tween(mainFrame, {BackgroundTransparency = 0}, 0.3)
-            else
-                Tween(mainFrame, {Size = UDim2.new(0, 0, 0, 0)}, 0.3, Enum.EasingStyle.Back)
-                Tween(mainFrame, {BackgroundTransparency = 1}, 0.3)
-            end
-        end)
-    end
-    
-    -- Content Area
-    local contentFrame = CreateInstance("Frame", {
-        Parent = mainFrame,
+    -- Content
+    local content = Create("Frame", {
+        Parent = main,
         Name = "Content",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0, 60),
-        Size = UDim2.new(1, 0, 1, -60)
+        Position = UDim2.new(0, 0, 0, 50),
+        Size = UDim2.new(1, 0, 1, -50)
     })
     
-    -- Tab Container
-    local tabContainer = CreateInstance("Frame", {
-        Parent = contentFrame,
-        Name = "TabContainer",
-        BackgroundColor3 = theme.Foreground,
-        Size = UDim2.new(0, 140, 1, 0),
-        Position = UDim2.new(0, 0, 0, 0)
+    -- Tabs
+    local tabs = Create("Frame", {
+        Parent = content,
+        Name = "Tabs",
+        BackgroundColor3 = Colors.Container,
+        Size = UDim2.new(0, 140, 1, 0)
     })
     
-    CreateInstance("UICorner", {
-        Parent = tabContainer,
-        CornerRadius = UDim.new(0, 12)
-    })
+    Create("UICorner", {Parent = tabs, CornerRadius = UDim.new(0, 8)})
+    Create("UIStroke", {Parent = tabs, Color = Colors.Border, Thickness = 1})
     
-    CreateInstance("UIStroke", {
-        Parent = tabContainer,
-        Color = theme.Border,
-        Thickness = 1
-    })
-    
-    local tabList = CreateInstance("ScrollingFrame", {
-        Parent = tabContainer,
-        Name = "TabList",
+    local tabList = Create("ScrollingFrame", {
+        Parent = tabs,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, -10, 1, -20),
         Position = UDim2.new(0, 5, 0, 10),
         ScrollBarThickness = 3,
-        ScrollBarImageColor3 = theme.Accent,
+        ScrollBarImageColor3 = Colors.Accent,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y
     })
     
-    local tabLayout = CreateInstance("UIListLayout", {
+    Create("UIListLayout", {
         Parent = tabList,
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 5)
     })
     
-    -- Main Content Area
-    local mainContent = CreateInstance("Frame", {
-        Parent = contentFrame,
+    -- Main Content
+    local mainContent = Create("Frame", {
+        Parent = content,
         Name = "MainContent",
-        BackgroundColor3 = theme.Foreground,
+        BackgroundColor3 = Colors.Container,
         Size = UDim2.new(1, -150, 1, 0),
         Position = UDim2.new(0, 150, 0, 0)
     })
     
-    CreateInstance("UICorner", {
-        Parent = mainContent,
-        CornerRadius = UDim.new(0, 12)
-    })
+    Create("UICorner", {Parent = mainContent, CornerRadius = UDim.new(0, 8)})
+    Create("UIStroke", {Parent = mainContent, Color = Colors.Border, Thickness = 1})
     
-    CreateInstance("UIStroke", {
+    local contentScroll = Create("ScrollingFrame", {
         Parent = mainContent,
-        Color = theme.Border,
-        Thickness = 1
-    })
-    
-    local contentScroll = CreateInstance("ScrollingFrame", {
-        Parent = mainContent,
-        Name = "ContentScroll",
         BackgroundTransparency = 1,
         Size = UDim2.new(1, -20, 1, -20),
         Position = UDim2.new(0, 10, 0, 10),
         ScrollBarThickness = 4,
-        ScrollBarImageColor3 = theme.Accent,
+        ScrollBarImageColor3 = Colors.Accent,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y
     })
     
-    local contentLayout = CreateInstance("UIListLayout", {
+    Create("UIListLayout", {
         Parent = contentScroll,
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 10)
+        Padding = UDim.new(0, 8)
     })
     
-    -- Draggable Header
+    -- Loading animasyonu
+    Tween(bar, {Size = UDim2.new(1, 0, 1, 0)}, 1.5)
+    
+    wait(1.8)
+    Tween(loading, {BackgroundTransparency = 1}, 0.3)
+    Tween(loadingContent, {Size = UDim2.new(0, 0, 0, 0)}, 0.3)
+    wait(0.4)
+    loading:Destroy()
+    
+    -- UI aç
+    main.Visible = true
+    Tween(main, {Size = UDim2.new(0, 500, 0, 400)}, 0.4, Enum.EasingStyle.Back)
+    
+    -- UI Functions
+    local window = {}
+    
+    -- Draggable
     local dragging = false
     local dragStart, startPos
     
@@ -473,7 +305,7 @@ function Vortex:CreateWindow(options)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
-            startPos = mainFrame.Position
+            startPos = main.Position
             
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -484,9 +316,9 @@ function Vortex:CreateWindow(options)
     end)
     
     UserInputService.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
-            mainFrame.Position = UDim2.new(
+            main.Position = UDim2.new(
                 startPos.X.Scale,
                 startPos.X.Offset + delta.X,
                 startPos.Y.Scale,
@@ -495,318 +327,399 @@ function Vortex:CreateWindow(options)
         end
     end)
     
-    -- Loading animasyonu tamamlanıyor
-    Tween(loadingBar, {Size = UDim2.new(1, 0, 1, 0)}, 2, Enum.EasingStyle.Quart)
+    -- Logo Toggle
+    local uiVisible = true
+    logoButton.MouseButton1Click:Connect(function()
+        uiVisible = not uiVisible
+        if uiVisible then
+            Tween(main, {Size = UDim2.new(0, 500, 0, 400)}, 0.3)
+        else
+            Tween(main, {Size = UDim2.new(0, 0, 0, 0)}, 0.3)
+        end
+    end)
     
-    wait(2.2)
+    -- UI Toggle Key
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.RightShift then
+            uiVisible = not uiVisible
+            if uiVisible then
+                Tween(main, {Size = UDim2.new(0, 500, 0, 400)}, 0.3)
+            else
+                Tween(main, {Size = UDim2.new(0, 0, 0, 0)}, 0.3)
+            end
+        end
+    end)
     
-    -- Loading ekranını kapat
-    Tween(loadingContainer, {Size = UDim2.new(0, 0, 0, 0)}, 0.5, Enum.EasingStyle.Back)
-    Tween(loadingContainer, {BackgroundTransparency = 1}, 0.5)
-    Tween(loadingText, {TextTransparency = 1}, 0.5)
-    Tween(loadingDots, {TextTransparency = 1}, 0.5)
+    -- Tab System
+    window.Tabs = {}
+    window.CurrentTab = nil
     
-    wait(0.6)
-    loadingFrame:Destroy()
-    
-    -- Main UI'yi aç
-    mainFrame.Visible = true
-    Tween(mainFrame, {Size = UDim2.new(0, 480, 0, 320)}, 0.5, Enum.EasingStyle.Back)
-    
-    -- UI Fonksiyonları
-    local windowFunctions = {}
-    
-    function windowFunctions:CreateTab(tabName)
+    function window:CreateTab(name)
         local tab = {}
         
         -- Tab Button
-        local tabButton = CreateInstance("TextButton", {
+        local tabBtn = Create("TextButton", {
             Parent = tabList,
-            Name = tabName .. "Tab",
-            BackgroundColor3 = theme.Container,
-            BackgroundTransparency = 0.5,
-            Size = UDim2.new(1, 0, 0, 40),
-            Font = Enum.Font.GothamSemibold,
-            Text = tabName,
-            TextColor3 = theme.SubText,
+            Name = name .. "Tab",
+            BackgroundColor3 = Colors.Element,
+            Size = UDim2.new(1, 0, 0, 36),
+            Font = Enum.Font.Gotham,
+            Text = name,
+            TextColor3 = Colors.SubText,
             TextSize = 14,
             AutoButtonColor = false
         })
         
-        CreateInstance("UICorner", {
-            Parent = tabButton,
-            CornerRadius = UDim.new(0, 8)
-        })
-        
-        CreateInstance("UIStroke", {
-            Parent = tabButton,
-            Color = theme.Border,
-            Thickness = 1,
-            Transparency = 0.5
-        })
+        Create("UICorner", {Parent = tabBtn, CornerRadius = UDim.new(0, 6)})
         
         -- Tab Content
-        local tabContent = CreateInstance("Frame", {
+        local tabContent = Create("Frame", {
             Parent = contentScroll,
-            Name = tabName .. "Content",
+            Name = name .. "Content",
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
             Visible = false
         })
         
-        local tabContentLayout = CreateInstance("UIListLayout", {
+        Create("UIListLayout", {
             Parent = tabContent,
             SortOrder = Enum.SortOrder.LayoutOrder,
             Padding = UDim.new(0, 8)
         })
         
-        -- Tab seçimi
+        -- Tab Selection
         local function SelectTab()
-            for _, child in pairs(contentScroll:GetChildren()) do
-                if child:IsA("Frame") and child.Name:find("Content") then
-                    child.Visible = false
-                end
+            if window.CurrentTab then
+                Tween(window.CurrentTab.Button, {
+                    BackgroundColor3 = Colors.Element,
+                    TextColor3 = Colors.SubText
+                }, 0.2)
+                window.CurrentTab.Content.Visible = false
             end
             
-            for _, child in pairs(tabList:GetChildren()) do
-                if child:IsA("TextButton") then
-                    Tween(child, {
-                        BackgroundColor3 = theme.Container,
-                        BackgroundTransparency = 0.5,
-                        TextColor3 = theme.SubText
-                    }, 0.2)
-                end
-            end
-            
-            tabContent.Visible = true
-            Tween(tabButton, {
-                BackgroundColor3 = theme.Accent,
-                BackgroundTransparency = 0.2,
-                TextColor3 = theme.Text
+            window.CurrentTab = tab
+            Tween(tabBtn, {
+                BackgroundColor3 = Colors.Accent,
+                TextColor3 = Colors.Text
             }, 0.2)
+            tabContent.Visible = true
         end
         
-        tabButton.MouseButton1Click:Connect(SelectTab)
+        tabBtn.MouseButton1Click:Connect(SelectTab)
         
-        -- İlk tab'ı seç
+        -- Auto-select first tab
         if #tabList:GetChildren() == 1 then
             SelectTab()
         end
         
-        -- UI Element Fonksiyonları
-        function tab:CreateButton(buttonOptions)
-            local buttonName = buttonOptions.Name or "Button"
-            local callback = buttonOptions.Callback or function() end
+        tab.Button = tabBtn
+        tab.Content = tabContent
+        
+        -- Element Functions
+        function tab:CreateButton(options)
+            options = options or {}
+            local name = options.Name or "Button"
+            local callback = options.Callback or function() end
             
-            local buttonFrame = CreateInstance("Frame", {
+            local btnFrame = Create("Frame", {
                 Parent = tabContent,
-                Name = buttonName .. "Button",
-                BackgroundColor3 = theme.Container,
-                BackgroundTransparency = 0.3,
+                Name = name .. "Button",
+                BackgroundColor3 = Colors.Element,
                 Size = UDim2.new(1, 0, 0, 40)
             })
             
-            CreateInstance("UICorner", {
-                Parent = buttonFrame,
-                CornerRadius = UDim.new(0, 8)
-            })
+            Create("UICorner", {Parent = btnFrame, CornerRadius = UDim.new(0, 6)})
+            Create("UIStroke", {Parent = btnFrame, Color = Colors.Border, Thickness = 1})
             
-            CreateInstance("UIStroke", {
-                Parent = buttonFrame,
-                Color = theme.Border,
-                Thickness = 1
-            })
-            
-            local buttonLabel = CreateInstance("TextLabel", {
-                Parent = buttonFrame,
-                Name = "Label",
+            local label = Create("TextLabel", {
+                Parent = btnFrame,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -20, 1, 0),
-                Position = UDim2.new(0, 10, 0, 0),
-                Font = Enum.Font.GothamSemibold,
-                Text = buttonName,
-                TextColor3 = theme.Text,
+                Position = UDim2.new(0, 12, 0, 0),
+                Size = UDim2.new(1, -24, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = name,
+                TextColor3 = Colors.Text,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
             
-            local buttonIcon = CreateInstance("TextLabel", {
-                Parent = buttonFrame,
-                Name = "Icon",
-                BackgroundTransparency = 1,
-                Size = UDim2.new(0, 30, 1, 0),
-                Position = UDim2.new(1, -40, 0, 0),
-                Font = Enum.Font.GothamBold,
-                Text = "›",
-                TextColor3 = theme.Accent,
-                TextSize = 20
-            })
-            
-            local buttonClick = CreateInstance("TextButton", {
-                Parent = buttonFrame,
-                Name = "ClickArea",
+            local click = Create("TextButton", {
+                Parent = btnFrame,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
                 Text = "",
                 AutoButtonColor = false
             })
             
-            buttonClick.MouseEnter:Connect(function()
-                Tween(buttonFrame, {BackgroundTransparency = 0.1}, 0.2)
-                Tween(buttonIcon, {Position = UDim2.new(1, -35, 0, 0)}, 0.2)
+            click.MouseEnter:Connect(function()
+                Tween(btnFrame, {BackgroundColor3 = Color3.fromRGB(45, 45, 60)}, 0.2)
             end)
             
-            buttonClick.MouseLeave:Connect(function()
-                Tween(buttonFrame, {BackgroundTransparency = 0.3}, 0.2)
-                Tween(buttonIcon, {Position = UDim2.new(1, -40, 0, 0)}, 0.2)
+            click.MouseLeave:Connect(function()
+                Tween(btnFrame, {BackgroundColor3 = Colors.Element}, 0.2)
             end)
             
-            buttonClick.MouseButton1Click:Connect(function()
-                Tween(buttonFrame, {Size = UDim2.new(0.98, 0, 0, 38)}, 0.1)
+            click.MouseButton1Click:Connect(function()
+                Tween(btnFrame, {Size = UDim2.new(0.98, 0, 0, 38)}, 0.1)
                 wait(0.1)
-                Tween(buttonFrame, {Size = UDim2.new(1, 0, 0, 40)}, 0.1)
+                Tween(btnFrame, {Size = UDim2.new(1, 0, 0, 40)}, 0.1)
                 callback()
             end)
             
             return {
                 SetText = function(text)
-                    buttonLabel.Text = text
+                    label.Text = text
                 end
             }
         end
         
-        function tab:CreateToggle(toggleOptions)
-            local toggleName = toggleOptions.Name or "Toggle"
-            local defaultValue = toggleOptions.Default or false
-            local callback = toggleOptions.Callback or function() end
+        function tab:CreateToggle(options)
+            options = options or {}
+            local name = options.Name or "Toggle"
+            local defaultValue = options.Default or false
+            local callback = options.Callback or function() end
             
-            local toggleValue = defaultValue
+            local value = defaultValue
             
-            local toggleFrame = CreateInstance("Frame", {
+            local toggleFrame = Create("Frame", {
                 Parent = tabContent,
-                Name = toggleName .. "Toggle",
-                BackgroundColor3 = theme.Container,
-                BackgroundTransparency = 0.3,
+                Name = name .. "Toggle",
+                BackgroundColor3 = Colors.Element,
                 Size = UDim2.new(1, 0, 0, 40)
             })
             
-            CreateInstance("UICorner", {
-                Parent = toggleFrame,
-                CornerRadius = UDim.new(0, 8)
-            })
+            Create("UICorner", {Parent = toggleFrame, CornerRadius = UDim.new(0, 6)})
+            Create("UIStroke", {Parent = toggleFrame, Color = Colors.Border, Thickness = 1})
             
-            CreateInstance("UIStroke", {
+            local label = Create("TextLabel", {
                 Parent = toggleFrame,
-                Color = theme.Border,
-                Thickness = 1
-            })
-            
-            local toggleLabel = CreateInstance("TextLabel", {
-                Parent = toggleFrame,
-                Name = "Label",
                 BackgroundTransparency = 1,
-                Size = UDim2.new(0.7, -10, 1, 0),
-                Position = UDim2.new(0, 10, 0, 0),
-                Font = Enum.Font.GothamSemibold,
-                Text = toggleName,
-                TextColor3 = theme.Text,
+                Position = UDim2.new(0, 12, 0, 0),
+                Size = UDim2.new(1, -70, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = name,
+                TextColor3 = Colors.Text,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left
             })
             
-            local toggleSwitch = CreateInstance("Frame", {
+            local switch = Create("Frame", {
                 Parent = toggleFrame,
                 Name = "Switch",
-                BackgroundColor3 = defaultValue and theme.Accent or theme.Container,
-                BackgroundTransparency = defaultValue and 0.3 or 0.5,
+                BackgroundColor3 = value and Colors.Accent or Colors.Element,
                 Size = UDim2.new(0, 50, 0, 24),
-                Position = UDim2.new(1, -70, 0.5, 0),
+                Position = UDim2.new(1, -62, 0.5, 0),
                 AnchorPoint = Vector2.new(0, 0.5)
             })
             
-            CreateInstance("UICorner", {
-                Parent = toggleSwitch,
-                CornerRadius = UDim.new(1, 0)
-            })
+            Create("UICorner", {Parent = switch, CornerRadius = UDim.new(1, 0)})
+            Create("UIStroke", {Parent = switch, Color = Colors.Border, Thickness = 1})
             
-            CreateInstance("UIStroke", {
-                Parent = toggleSwitch,
-                Color = theme.Border,
-                Thickness = 1
-            })
-            
-            local toggleCircle = CreateInstance("Frame", {
-                Parent = toggleSwitch,
-                Name = "Circle",
-                BackgroundColor3 = theme.Text,
+            local circle = Create("Frame", {
+                Parent = switch,
+                BackgroundColor3 = Colors.Text,
                 Size = UDim2.new(0, 18, 0, 18),
-                Position = defaultValue and UDim2.new(1, -22, 0.5, 0) or UDim2.new(0, 4, 0.5, 0),
+                Position = value and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 3, 0.5, 0),
                 AnchorPoint = Vector2.new(0, 0.5)
             })
             
-            CreateInstance("UICorner", {
-                Parent = toggleCircle,
-                CornerRadius = UDim.new(1, 0)
-            })
+            Create("UICorner", {Parent = circle, CornerRadius = UDim.new(1, 0)})
             
-            local toggleClick = CreateInstance("TextButton", {
+            local click = Create("TextButton", {
                 Parent = toggleFrame,
-                Name = "ClickArea",
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
                 Text = "",
                 AutoButtonColor = false
             })
             
-            local function UpdateToggle()
-                if toggleValue then
-                    Tween(toggleSwitch, {BackgroundColor3 = theme.Accent, BackgroundTransparency = 0.3}, 0.2)
-                    Tween(toggleCircle, {Position = UDim2.new(1, -22, 0.5, 0)}, 0.2)
+            local function Update()
+                if value then
+                    Tween(switch, {BackgroundColor3 = Colors.Accent}, 0.2)
+                    Tween(circle, {Position = UDim2.new(1, -20, 0.5, 0)}, 0.2)
                 else
-                    Tween(toggleSwitch, {BackgroundColor3 = theme.Container, BackgroundTransparency = 0.5}, 0.2)
-                    Tween(toggleCircle, {Position = UDim2.new(0, 4, 0.5, 0)}, 0.2)
+                    Tween(switch, {BackgroundColor3 = Colors.Element}, 0.2)
+                    Tween(circle, {Position = UDim2.new(0, 3, 0.5, 0)}, 0.2)
                 end
-                callback(toggleValue)
+                callback(value)
             end
             
-            toggleClick.MouseButton1Click:Connect(function()
-                toggleValue = not toggleValue
-                UpdateToggle()
+            click.MouseButton1Click:Connect(function()
+                value = not value
+                Update()
             end)
             
-            UpdateToggle()
+            Update()
             
             return {
-                Set = function(value)
-                    toggleValue = value
-                    UpdateToggle()
+                Set = function(val)
+                    value = val
+                    Update()
                 end,
                 Get = function()
-                    return toggleValue
+                    return value
                 end
             }
         end
         
+        function tab:CreateSlider(options)
+            options = options or {}
+            local name = options.Name or "Slider"
+            local min = options.Min or 0
+            local max = options.Max or 100
+            local default = options.Default or min
+            local callback = options.Callback or function() end
+            
+            local value = default
+            
+            local sliderFrame = Create("Frame", {
+                Parent = tabContent,
+                Name = name .. "Slider",
+                BackgroundColor3 = Colors.Element,
+                Size = UDim2.new(1, 0, 0, 60)
+            })
+            
+            Create("UICorner", {Parent = sliderFrame, CornerRadius = UDim.new(0, 6)})
+            Create("UIStroke", {Parent = sliderFrame, Color = Colors.Border, Thickness = 1})
+            
+            local label = Create("TextLabel", {
+                Parent = sliderFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 12, 0, 8),
+                Size = UDim2.new(1, -24, 0, 18),
+                Font = Enum.Font.Gotham,
+                Text = name,
+                TextColor3 = Colors.Text,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+            
+            local valueLabel = Create("TextLabel", {
+                Parent = sliderFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, 0, 0, 8),
+                Size = UDim2.new(0.5, -12, 0, 18),
+                Font = Enum.Font.GothamSemibold,
+                Text = tostring(value),
+                TextColor3 = Colors.Accent,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Right
+            })
+            
+            local barBg = Create("Frame", {
+                Parent = sliderFrame,
+                BackgroundColor3 = Colors.Container,
+                Position = UDim2.new(0, 12, 0, 36),
+                Size = UDim2.new(1, -24, 0, 6)
+            })
+            
+            Create("UICorner", {Parent = barBg, CornerRadius = UDim.new(1, 0)})
+            
+            local fill = Create("Frame", {
+                Parent = barBg,
+                BackgroundColor3 = Colors.Accent,
+                Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
+            })
+            
+            Create("UICorner", {Parent = fill, CornerRadius = UDim.new(1, 0)})
+            
+            local knob = Create("Frame", {
+                Parent = barBg,
+                BackgroundColor3 = Colors.Text,
+                Size = UDim2.new(0, 12, 0, 12),
+                Position = UDim2.new((value - min) / (max - min), 0, 0.5, 0),
+                AnchorPoint = Vector2.new(0, 0.5)
+            })
+            
+            Create("UICorner", {Parent = knob, CornerRadius = UDim.new(1, 0)})
+            Create("UIStroke", {Parent = knob, Color = Colors.Accent, Thickness = 2})
+            
+            local dragging = false
+            
+            local function UpdateSlider(input)
+                local pos = (input.Position.X - barBg.AbsolutePosition.X) / barBg.AbsoluteSize.X
+                pos = math.clamp(pos, 0, 1)
+                value = math.floor(min + (max - min) * pos)
+                
+                valueLabel.Text = tostring(value)
+                fill.Size = UDim2.new(pos, 0, 1, 0)
+                knob.Position = UDim2.new(pos, 0, 0.5, 0)
+                
+                callback(value)
+            end
+            
+            barBg.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    UpdateSlider(input)
+                end
+            end)
+            
+            barBg.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    UpdateSlider(input)
+                end
+            end)
+            
+            return {
+                Set = function(val)
+                    value = math.clamp(val, min, max)
+                    local pos = (value - min) / (max - min)
+                    valueLabel.Text = tostring(value)
+                    fill.Size = UDim2.new(pos, 0, 1, 0)
+                    knob.Position = UDim2.new(pos, 0, 0.5, 0)
+                    callback(value)
+                end,
+                Get = function()
+                    return value
+                end
+            }
+        end
+        
+        function tab:CreateLabel(text)
+            local labelFrame = Create("Frame", {
+                Parent = tabContent,
+                BackgroundColor3 = Colors.Element,
+                Size = UDim2.new(1, 0, 0, 30)
+            })
+            
+            Create("UICorner", {Parent = labelFrame, CornerRadius = UDim.new(0, 6)})
+            
+            Create("TextLabel", {
+                Parent = labelFrame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, -12, 1, 0),
+                Position = UDim2.new(0, 6, 0, 0),
+                Font = Enum.Font.Gotham,
+                Text = text,
+                TextColor3 = Colors.SubText,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+            
+            return {
+                SetText = function(newText)
+                    labelFrame.TextLabel.Text = newText
+                end
+            }
+        end
+        
+        table.insert(window.Tabs, tab)
         return tab
     end
     
-    -- UI Toggle Tuşu (Varsayılan: RightShift)
-    local toggleKey = Enum.KeyCode.RightShift
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == toggleKey then
-            isUIVisible = not isUIVisible
-            if isUIVisible then
-                Tween(mainFrame, {Size = UDim2.new(0, 480, 0, 320)}, 0.3, Enum.EasingStyle.Back)
-                Tween(mainFrame, {BackgroundTransparency = 0}, 0.3)
-            else
-                Tween(mainFrame, {Size = UDim2.new(0, 0, 0, 0)}, 0.3, Enum.EasingStyle.Back)
-                Tween(mainFrame, {BackgroundTransparency = 1}, 0.3)
-            end
-        end
-    end)
+    function window:Destroy()
+        screenGui:Destroy()
+    end
     
-    return windowFunctions
+    return window
 end
 
 return Vortex
